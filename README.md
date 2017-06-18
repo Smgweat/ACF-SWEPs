@@ -10,11 +10,11 @@ Huge thanks to Bubbus and everyone else working on ACF and XCF; both for creatin
 
 
 ### To Do:
-- [ ] Update acf_swepconfig to the currently modified version.
+- [x] Update acf_swepconfig to the currently modified version.
 - [ ] Introduce c-model weapons and higher fidelity sounds;
   - [ ] AK47
-  - [ ] Galil
-  - [ ] Deagle
+  - [x] Galil
+  - [x] Deagle
   - [ ] Elite
   - [ ] UMP45
   - [ ] AWP
