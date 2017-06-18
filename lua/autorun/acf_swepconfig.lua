@@ -1,19 +1,14 @@
 /*
-       _   ___ ___   ___                    
-      /_\ / __| __| / __|_ __ _____ _ __ ___
-     / _ \ (__| _|  \__ \ V  V / -_) '_ (_-<
-    /_/ \_\___|_|   |___/\_/\_/\___| .__/__/
-                    By Bubbus!     |_|      
+	    ___   ____________   ______       ____________     __________  _   __________________
+	   /   | / ____/ ____/  / ___/ |     / / ____/ __ \   / ____/ __ \/ | / / ____/  _/ ____/
+	  / /| |/ /   / /_______\__ \| | /| / / __/ / /_/ /  / /   / / / /  |/ / /_   / // / __  
+	 / ___ / /___/ __/_____/__/ /| |/ |/ / /___/ ____/  / /___/ /_/ / /|  / __/ _/ // /_/ /  
+	/_/  |_\____/_/       /____/ |__/|__/_____/_/       \____/\____/_/ |_/_/   /___/\____/   
 
-	Global configuration for the SWEPs!
-	
-//*/
-
-
-
+*/
 
 // What accuracy scheme to use?  Choose from WOT, Shooter, Static
-local AimStyle = "Shooter"
+local AimStyle = "WOT"
 
 // What reticule should we use?  Choose from Circle, Crosshair
 local Reticule = "Crosshair"
@@ -27,7 +22,7 @@ local NoclipShooting = false
 // Kick up dust on bullet impacts for all guns, or only snipers?  Fun but potentially laggy.
 local AlwaysDust = false
 // Make the weapon tracers match the player's custom colour?
-local PlayerTracers = true
+local PlayerTracers = false
 
 
 // How fast should stamina drain while sprinting?  This is a scaling number.
@@ -36,13 +31,15 @@ local STAMINA_DRAIN = 0.4
 local STAMINA_RECOVER = 0.09
 
 // How much should velocity affect accuracy?  This is a scaling number.
-local VEL_SCALE = 60
+local VEL_SCALE = 70
 
+// A linear modifier of how much damage bullets deal. This is determined by their velocity and penetration area. Between 0 and 1 Preferred.
+local DAMAGE_SCALE = 0.75
 
 // In WOT mode, what the inaccuracy shrinking is multiplied by.  This balances Shooter with WOT.
 local WOT_ACC_SCALE = 1.2
 // In WOT mode, what the inaccuracy growth caused my moving your aim is multiplied by.
-local WOT_INACC_AIM = 1
+local WOT_INACC_AIM = 0.6
 
 // In shooter mode, what the minimum inaccuracy is multiplied by.  This balances Shooter with WOT.
 local SHOOTER_INACC_MUL = 2
@@ -371,9 +368,9 @@ if CLIENT then
 	
 		screenpos = Vector(math.floor(screenpos.x + 0.5), math.floor(screenpos.y + 0.5), 0)
 	
-		local alpha = (self:GetNetworkedBool("Zoomed") and ACF.SWEP.IronSights and self.IronSights and not self.HasScope) and 50 or 255
+		local alpha = (self:GetNetworkedBool("Zoomed") and ACF.SWEP.IronSights and self.IronSights and not self.HasScope) and (1 - self.zoomProgress) or self.zoomProgress
 	
-		local circlehue = Color(255, colourFade*255, colourFade*255, alpha)
+		local circlehue = Color(colourFade*255, colourFade*255, colourFade*255, 255*alpha)
 	
 		if self.ShotSpread and self.ShotSpread > 0 then
 			radius = ScrW() / 2 * (self.ShotSpread) / self.Owner:GetFOV()
@@ -390,15 +387,15 @@ if CLIENT then
 	
 	rets.Crosshair = {}
 	local Crosshair = rets.Crosshair
-	local CrosshairLength = 20
+	local CrosshairLength = 10
 	
 	function Crosshair.Draw(self, screenpos, radius, progress, colourFade)
 	
 		screenpos = Vector(math.floor(screenpos.x + 0.5), math.floor(screenpos.y + 0.5), 0)
+		
+		local alpha = (self:GetNetworkedBool("Zoomed") and ACF.SWEP.IronSights and self.IronSights and not self.HasScope) and (1 - self.zoomProgress) or self.zoomProgress
 	
-		local alpha = (self:GetNetworkedBool("Zoomed") and ACF.SWEP.IronSights and self.IronSights and not self.HasScope) and 70 or 255
-	
-		local circlehue = Color(255, colourFade*255, colourFade*255, alpha)
+		local circlehue = Color(colourFade*255, colourFade*255, colourFade*255, 255*alpha)
 	
 		if self.ShotSpread and self.ShotSpread > 0 then
 			radius = ScrW() / 2 * (self.ShotSpread) / self.Owner:GetFOV()
@@ -411,20 +408,34 @@ if CLIENT then
 		if progress < 1 then progress = 1 - progress end
 		radius = radius + 1
 		
-		surface.SetDrawColor(Color(0, 0, 0, circlehue.a))
-		surface.DrawRect((screenpos.x - radius - CrosshairLength - 1), screenpos.y - 1, CrosshairLength + 3, 3)
-		surface.DrawRect((screenpos.x + radius - 1), screenpos.y - 1, CrosshairLength + 2, 3)
-		surface.DrawRect(screenpos.x - 1, (screenpos.y - radius - CrosshairLength - 1), 3, CrosshairLength + 3)
-		surface.DrawRect(screenpos.x - 1, (screenpos.y + radius - 1), 3, CrosshairLength + 2)
+		/* Switch to a RED DOT SIGHT on zooming in...
+		drawColor = Color(255, 255*alpha, 255*alpha, 255)
+		surface.SetDrawColor( drawColor )
+		surface.DrawRect((screenpos.x - radius - CrosshairLength - 1), screenpos.y, CrosshairLength + 3, 1)
+		surface.DrawRect((screenpos.x + radius - 1), screenpos.y, CrosshairLength + 2, 1)
+		surface.DrawRect(screenpos.x, (screenpos.y - radius - CrosshairLength - 1), 1, CrosshairLength + 3)
+		surface.DrawRect(screenpos.x, (screenpos.y + radius - 1), 1, CrosshairLength + 2)
+		surface.DrawCircle(screenpos.x, screenpos.y, radius , drawColor.r, drawColor.g, drawColor.b, (1 - alpha)^2*255)
+		*/
 		
-		surface.SetDrawColor(circlehue)
-		surface.DrawLine((screenpos.x + radius), screenpos.y, (screenpos.x + (radius + CrosshairLength * progress)), screenpos.y)
-		surface.DrawLine((screenpos.x - radius), screenpos.y, (screenpos.x - (radius + CrosshairLength * progress) - 1), screenpos.y)
-		surface.DrawLine(screenpos.x, (screenpos.y + radius), screenpos.x, (screenpos.y + (radius + CrosshairLength * progress)))
-		surface.DrawLine(screenpos.x, (screenpos.y - radius), screenpos.x, (screenpos.y - (radius + CrosshairLength * progress) - 1))
+		//Top Layer
+		drawColor = Color(255, 255, 255, alpha^2*255)
+		surface.SetDrawColor( drawColor )
+		//surface.SetDrawColor(Color(255, 255, 255, circlehue.a))
+		surface.DrawRect((screenpos.x - radius - CrosshairLength - 1), screenpos.y, CrosshairLength + 3, 1)
+		surface.DrawRect((screenpos.x + radius - 1), screenpos.y, CrosshairLength + 2, 1)
+		surface.DrawRect(screenpos.x, (screenpos.y - radius - CrosshairLength - 1), 1, CrosshairLength + 3)
+		surface.DrawRect(screenpos.x, (screenpos.y + radius - 1), 1, CrosshairLength + 2)
 		
+		//surface.SetDrawColor(circlehue)
+		//surface.DrawLine((screenpos.x + radius), screenpos.y, (screenpos.x + (radius + CrosshairLength * progress)), screenpos.y)
+		//surface.DrawLine((screenpos.x - radius), screenpos.y, (screenpos.x - (radius + CrosshairLength * progress) - 1), screenpos.y)
+		//surface.DrawLine(screenpos.x, (screenpos.y + radius), screenpos.x, (screenpos.y + (radius + CrosshairLength * progress)))
+		//surface.DrawLine(screenpos.x, (screenpos.y - radius), screenpos.x, (screenpos.y - (radius + CrosshairLength * progress) - 1))
 		
-		--draw.Arc(screenpos.x, screenpos.y, radius, -1.5, (1-progress)*360, 360, 5, circlehue)
+		//surface.DrawCircle(screenpos.x, screenpos.y, radius , drawColor.r, drawColor.g, drawColor.b, (1 - alpha)^2*255)
+		
+		//draw.Arc(screenpos.x, screenpos.y, radius+4, -1, (1-progress)*360, 360, 5, circlehue)
 		
 	end
 
@@ -437,14 +448,105 @@ if CLIENT then
 	
 end
 
-
-
-
 if not (AimStyle and aim[AimStyle]) then
 	print("ACF SWEPs: Couldn't find the " .. tostring(AimStyle) .. " aim-style!  Please choose a valid aim-style in acf_swepconfig.lua.  Defaulting to WOT.")
 	AimStyle = "WOT"
 end
 
 if not aim[AimStyle] then error("ACF SWEPs: Couldn't find the " .. tostring(AimStyle) .. " aim-style!  Please choose a valid aim-style in acf_swepconfig.lua") end
+
+// Overriding the standard ACF damage curves because it's rediculous.
+
+function ACF_SquishyDamageOverride( Entity , Energy , FrAera , Angle , Inflictor , Bone, Gun)
+	
+	local Size = Entity:BoundingRadius()
+	local Mass = Entity:GetPhysicsObject():GetMass()
+	local HitRes = {}
+	local Damage = 0
+	local Target = {ACF = {Armour = 0.1}}		--We create a dummy table to pass armour values to the calc function
+	if (Bone) then
+		
+		local Damage_Offset = ( (math.random() + 3) / 4 ) -- 3 and 4 determine the damage variability. 
+			
+		local DamageBase = ( ( 1 + FrAera * 0.9 ) * (Energy.Kinetic^0.8) )^0.5 * Damage_Offset * DAMAGE_SCALE
+
+		print(FrAera .. " - Front Area")
+		print(Energy.Kinetic .. " - Kinetic Energy")
+			
+		if ( Bone == 1 ) then		--This means we hit the head
+			Target.ACF.Armour = 1		--Set the skull thickness as a percentage of Squishy weight, this gives us 2mm for a player, about 22mm for an Antlion Guard. Seems about right
+			HitRes = ACF_CalcDamage( Target , Energy , FrAera , Angle )		--This is hard bone, so still sensitive to impact angle
+			Damage = DamageBase*20	
+
+		elseif ( Bone == 0 or Bone == 2 or Bone == 3 ) then		--This means we hit the torso. We are assuming body armour/tough exoskeleton/zombie don't give fuck here, so it's tough
+			Target.ACF.Armour = 1.2		--Set the armour thickness as a percentage of Squishy weight, this gives us 8mm for a player, about 90mm for an Antlion Guard. Seems about right
+			HitRes = ACF_CalcDamage( Target , Energy , FrAera , Angle )		--Armour plate,, so sensitive to impact angle
+			Damage = DamageBase*12
+
+		elseif ( Bone == 4 or Bone == 5 ) then 		--This means we hit an arm or appendage, so ormal damage, no armour
+			Target.ACF.Armour = 1.2							--A fitht the bounding radius seems about right for most critters appendages
+			HitRes = ACF_CalcDamage( Target , Energy , FrAera , 0 )		--This is flesh, angle doesn't matter
+			Damage = DamageBase*6							--Limbs are somewhat less important
+		
+		elseif ( Bone == 6 or Bone == 7 ) then
+			Target.ACF.Armour = 1.2								--A fitht the bounding radius seems about right for most critters appendages
+			HitRes = ACF_CalcDamage( Target , Energy , FrAera , 0 )		--This is flesh, angle doesn't matter
+			Damage = DamageBase*6								--Limbs are somewhat less important
+			
+		elseif ( Bone == 10 ) then					--This means we hit a backpack or something
+			Target.ACF.Armour = 1.2								--Arbitrary size, most of the gear carried is pretty small
+			HitRes = ACF_CalcDamage( Target , Energy , FrAera , 0 )		--This is random junk, angle doesn't matter
+			Damage = DamageBase*2									--Damage is going to be fright and shrapnel, nothing much		
+
+		else 										--Just in case we hit something not standard
+			Target.ACF.Armour = 1.2						
+			HitRes = ACF_CalcDamage( Target , Energy , FrAera , 0 )
+			Damage = DamageBase*2	
+			
+		end
+		
+	else 										--Just in case we hit something not standard
+		Target.ACF.Armour = 3							
+		HitRes = ACF_CalcDamage( Target , Energy , FrAera , 0 )
+		Damage = HitRes.Damage*10	
+	
+	end
+	print(Damage)
+	--BNK stuff
+	if (ISBNK) then
+		if(Entity.freq and Inflictor.freq) then
+			if (Entity != Inflictor) and (Entity.freq == Inflictor.freq) then
+				dmul = 0
+			end
+		end
+	end
+	
+	--SITP stuff
+	local var = 1
+	if(!Entity.sitp_spacetype) then
+		Entity.sitp_spacetype = "space"
+	end
+	if(Entity.sitp_spacetype == "homeworld") then
+		var = 0
+	end
+	
+	--if Ammo == true then
+	--	Entity.KilledByAmmo = true
+	--end
+	if IsValid(Entity) then
+		Entity:TakeDamage( Damage * var, Inflictor, Gun )
+	end
+	--if Ammo == true then
+	--	Entity.KilledByAmmo = false
+	--end
+	
+	HitRes.Kill = false
+	--print(Damage)
+	--print(Bone)
+		
+	return HitRes
+end
+
+ACF_SquishyDamage = ACF_SquishyDamageOverride
 
 AddCSLuaFile()
