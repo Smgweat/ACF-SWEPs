@@ -468,10 +468,10 @@ function ACF_SquishyDamageOverride( Entity , Energy , FrAera , Angle , Inflictor
 		
 		local Damage_Offset = ( (math.random() + 3) / 4 ) -- 3 and 4 determine the damage variability. 
 			
-		local DamageBase = ( ( 1 + FrAera * 0.9 ) * (Energy.Kinetic^0.8) )^0.5 * Damage_Offset * DAMAGE_SCALE
+		local DamageBase = ( ( 1 + FrAera * 0.9 ) * (Energy.Penetration^0.8) )^0.5 * Damage_Offset * DAMAGE_SCALE
 
 		print(FrAera .. " - Front Area")
-		print(Energy.Kinetic .. " - Kinetic Energy")
+		//print(Energy.Kinetic .. " - Kinetic Energy")
 			
 		if ( Bone == 1 ) then		--This means we hit the head
 			Target.ACF.Armour = 1		--Set the skull thickness as a percentage of Squishy weight, this gives us 2mm for a player, about 22mm for an Antlion Guard. Seems about right
