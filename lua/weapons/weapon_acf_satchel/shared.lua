@@ -23,10 +23,12 @@ SWEP.ViewModelFOV               = 65
 SWEP.Spawnable			= true
 SWEP.AdminSpawnable		= false
 SWEP.Category			= "ACF"
-SWEP.ViewModel 			= "models/weapons/v_slam.mdl"
+SWEP.ViewModel 			= "models/weapons/c_slam.mdl"
 SWEP.WorldModel 		= "models/weapons/w_slam.mdl"
 SWEP.ThrowModel 		= "models/weapons/w_slam.mdl"
-SWEP.ViewModelFlip		= true
+SWEP.ViewModelFlip		= false
+
+SWEP.UseHands = true
 
 SWEP.Weight				= 5
 SWEP.AutoSwitchTo		= false
@@ -105,7 +107,7 @@ function SWEP:PrimaryAttack()
 		self.PressedTime = CurTime()
 		if SERVER then
 			self.Owner.ACFSatchels = self.Owner.ACFSatchels or {}
-			--self.Weapon:SendWeaponAnim(ACT_VM_PULLPIN)
+			--self.Weapon:SendWeaponAnim(ACT_SLAM_THROW_THROW_ND2)
 		end
 		
 	end
@@ -124,7 +126,7 @@ function SWEP:SecondaryAttack()
 			timer.Simple(0.25, function() self:DetonateSatchels() end)
 		else
 			self:EmitSound("buttons/button24.wav", 50, 100)
-			--self.Weapon:SendWeaponAnim(ACT_SLAM_DETONATOR_DETONATE)
+			--self.Weapon:SendWeaponAnim(ACT_SLAM_THROW_DETONATE)
 		end
 		
 	end

@@ -23,10 +23,12 @@ SWEP.ViewModelFOV       = 65
 SWEP.Spawnable			= true
 SWEP.AdminSpawnable		= false
 SWEP.Category			= "ACF"
-SWEP.ViewModel 			= "models/weapons/v_eq_smokegrenade.mdl"
+SWEP.ViewModel 			= "models/weapons/cstrike/c_eq_smokegrenade.mdl"
 SWEP.WorldModel 		= "models/weapons/w_eq_smokegrenade.mdl"
 SWEP.ThrowModel 		= "models/weapons/w_eq_smokegrenade_thrown.mdl"
-SWEP.ViewModelFlip		= true
+SWEP.ViewModelFlip		= false
+
+SWEP.UseHands = true
 
 SWEP.Weight				= 5
 SWEP.AutoSwitchTo		= false
@@ -74,7 +76,7 @@ SWEP.IsGrenadeWeapon	= true
 SWEP.GrenadeRemove		= true
 SWEP.HasChargeTimer		= true
 SWEP.ChargeTime = 2
-SWEP.ThrowVel	= 18
+SWEP.ThrowVel	= 22
 
 SWEP.SmokeColours = 
 {
