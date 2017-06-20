@@ -257,20 +257,11 @@ end)
 
 
 function SWEP:ZoomTween(t)
+
+	t = (t - 0.5) * 2
 	
-	local s = 1.7
-	
-	if t < 0.5 then
-		t = t * 1.525
-		--s = s * 1.525
-		--return 0.5*(t*t*((s+1)*t - s))
-		return -math.cos(t * math.pi / 2) + 1
-	else
-		t = t * 2
-		t = t - 2
-		s = s * 1.525
-		return 0.5*(t*t*((s+1)*t+ s) + 2)
-	end
+	return ( ( (t + 1)^2 ) / ( t^2 + 1 ) ) / 2
+
 end
 
 
@@ -300,11 +291,11 @@ function SWEP:GetViewModelPosition( pos, ang )
 	else
 		
 	end
-	local sway = Angle(y, x, 0)
+	local sway = Angle(y, x, 0)*0.1
 	self.lastaccuracy = accuracy * 4
 	
 	local tween = self:ZoomTween(self.zoomProgress)
-	
+
 	self.curPos = LerpVector(tween, self.fromPos, self.toPos)
 	local modpos = pos + self.curPos
 	self.curAng = LerpAngle(tween, self.fromAng, self.toAng)
