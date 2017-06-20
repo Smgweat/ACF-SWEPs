@@ -4,14 +4,6 @@ AddCSLuaFile( "shared.lua" )
 
 include('shared.lua')
 
-
-
-SWEP.Weight				= 5
-SWEP.AutoSwitchTo		= false
-SWEP.AutoSwitchFrom		= false
-
-
-
 function SWEP:Initialize()
 	self:SetWeaponHoldType(self.HoldType)
 	if IsValid(self:GetParent()) then
@@ -59,8 +51,6 @@ function SWEP:OnRemove()
 end
 
 
-
-
 local nosplode = {AP = true, HP = true, FLR = true}
 local nopen = {HE = true, SM = true, FLR = true}
 function SWEP:DoAmmoStatDisplay()
@@ -76,12 +66,12 @@ function SWEP:DoAmmoStatDisplay()
 	if bdata.Tracer and bdata.Tracer > 0 then 
 		roundType = roundType .. "-T"
 	end
-	
+
 	local sendInfo = string.format( "%smm %s ammo: %im/s speed",
                                     tostring(bdata.Caliber * 10),
 									roundType,
 									self.ThrowVel or bdata.MuzzleVel)
-	
+
 	local RoundData = list.Get("ACFRoundTypes")[ bdata.Type ]
     
 	if RoundData and RoundData.getDisplayData then
@@ -93,16 +83,16 @@ function SWEP:DoAmmoStatDisplay()
         end
         
         if not nosplode[bdata.Type] then
-            sendInfo = sendInfo .. string.format( 	", %.1fm blast",
-                                                    DisplayData.BlastRadius)
+			if DisplayData.BlastRadius then
+				sendInfo = sendInfo .. string.format( 	", %.1fm blast",
+														DisplayData.BlastRadius)
+			end
         end
             
 	end
 	
 	self.Owner:SendLua(string.format("GAMEMODE:AddNotify(%q, \"NOTIFY_HINT\", 10)", sendInfo))
 end
-
-
 
 
 function SWEP:Deploy()
@@ -116,8 +106,6 @@ function SWEP:Deploy()
 end
 
 
-
-
 function SWEP:FireBullet()
 
 	local MuzzlePos = self.Owner:GetShootPos()
@@ -127,10 +115,14 @@ function SWEP:FireBullet()
 	local MuzzleVecFinal = self:inaccuracy(MuzzleVec, self.Inaccuracy)
 	
 	self.BulletData["Pos"] = MuzzlePos
-	self.BulletData["Flight"] = MuzzleVecFinal * self.BulletData["MuzzleVel"] * 39.37 + self.Owner:GetVelocity() + MuzzleVecFinal * 16
+	//print ( self.BulletData["MuzzleVel"] )
+	//print ( MuzzleVec )
+	//print ( MuzzleVecFinal )
+	self.BulletData["Flight"] = ( self.BulletData["MuzzleVel"] * MuzzleVecFinal * 52.4590163934 ) + self.Owner:GetVelocity()
+	//print ( self.BulletData["Flight"] )
 	self.BulletData["Owner"] = self.Owner
 	self.BulletData["Gun"] = self
-	
+
 	if self.BeforeFire then
 		self:BeforeFire()
 	end

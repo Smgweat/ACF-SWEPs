@@ -3,34 +3,36 @@
 
 if (CLIENT) then
 	
-	SWEP.PrintName			= "ACF Grenade"
-	SWEP.Author				= "Bubbus"
+	SWEP.PrintName			= "M68 Impact Hand Grenade"
+	SWEP.Author				= "Alexander"
 	SWEP.Slot				= 4
 	SWEP.SlotPos			= 3
 	SWEP.IconLetter			= "f"
 	SWEP.DrawCrosshair		= false
-	SWEP.Purpose		= "Make groups of dudes disappear."
+	SWEP.Purpose			= "Make groups of dudes disappear."
 	SWEP.Instructions       = "Reload at Bomb Ammo-boxes!"
 
 end
 
 util.PrecacheSound( "weapons/launcher_fire.wav" )
 
-SWEP.Base				= "weapon_acf_base"
-SWEP.ViewModelFlip			= false
-SWEP.ViewModelFOV               = 65
+SWEP.Base			= "weapon_acf_base"
+SWEP.ViewModelFlip	= false
+SWEP.ViewModelFOV   = 65
 
 SWEP.Spawnable			= true
-SWEP.AdminSpawnable		= false
-SWEP.Category			= "ACF"
-SWEP.ViewModel 			= "models/weapons/v_eq_fraggrenade.mdl"
-SWEP.WorldModel 		= "models/weapons/w_eq_fraggrenade.mdl"
-SWEP.ThrowModel 		= "models/weapons/w_eq_fraggrenade.mdl"
-SWEP.ViewModelFlip		= true
+SWEP.AdminSpawnable	= false
+SWEP.Category		= "ACF"
+SWEP.ViewModel 		= "models/weapons/cstrike/c_eq_fraggrenade.mdl"
+SWEP.WorldModel 	= "models/weapons/w_eq_fraggrenade.mdl"
+SWEP.ThrowModel 	= "models/weapons/w_eq_fraggrenade.mdl"
+SWEP.ViewModelFlip	= false
 
-SWEP.Weight				= 5
-SWEP.AutoSwitchTo		= false
-SWEP.AutoSwitchFrom		= false
+SWEP.UseHands = true
+
+SWEP.Weight			= 5
+SWEP.AutoSwitchTo	= false
+SWEP.AutoSwitchFrom	= false
 
 SWEP.Primary.Recoil			= 5
 SWEP.Primary.ClipSize		= -1
@@ -74,7 +76,7 @@ SWEP.IsGrenadeWeapon	= true
 SWEP.GrenadeRemove		= true
 SWEP.HasChargeTimer		= true
 SWEP.ChargeTime = 3
-SWEP.ThrowVel	= 14
+SWEP.ThrowVel	= 20
 
 
 
@@ -145,7 +147,7 @@ function SWEP:ThinkBefore()
 			self:ShootEffects()
 			self.Weapon:EmitSound( self.Primary.Sound )
 			self.Weapon:TakePrimaryAmmo(1)
-			self:FireBullet()
+			timer.Simple(0.35, function() self:FireBullet() end)
 		end
 		
 		self.PressedDuration = nil

@@ -1,44 +1,42 @@
-	AddCSLuaFile( "shared.lua" )
-	SWEP.HoldType			= "ar2"
+// Credit to Bubbus for all the hard work, I just changed the easy stuff.
+
+AddCSLuaFile( "shared.lua" )
+SWEP.HoldType			= "ar2"
 
 if (CLIENT) then
-	
-	SWEP.PrintName			= "ACF Base"
-	SWEP.Author				= "Bubbus"
-	SWEP.Slot				= 4
-	SWEP.SlotPos			= 3
-	SWEP.IconLetter			= "f"
-	SWEP.DrawCrosshair		= false
+	SWEP.Slot			= 0
+	SWEP.DrawCrosshair	= false
+	SWEP.Author			= "Bubbus"
+	SWEP.PrintName		= "ACF Base"
 	SWEP.Purpose		= "Why do you have this"
-	SWEP.Instructions       = "pls stop"
-
+	SWEP.Instructions   = "pls stop"
 end
 
-util.PrecacheSound( "weapons/launcher_fire.wav" )
+SWEP.Base			= "weapon_base"
+SWEP.ViewModelFlip	= false
+SWEP.ViewModelFOV	= 50
 
-SWEP.Base				= "weapon_base"
-SWEP.ViewModelFlip			= false
+SWEP.Spawnable		= false
+SWEP.AdminSpawnable	= false
+SWEP.Category		= "ACF"
+SWEP.ViewModel 		= "";
+SWEP.WorldModel 	= "";
 
-SWEP.Spawnable			= false
-SWEP.AdminSpawnable		= false
-SWEP.Category			= "ACF"
-SWEP.ViewModel 			= "models/weapons/v_snip_sg550.mdl";
-SWEP.WorldModel 		= "models/weapons/w_snip_sg550.mdl";
-SWEP.ViewModelFlip		= true
+SWEP.UseHands = false
 
-SWEP.Weight				= 5
-SWEP.AutoSwitchTo		= true
-SWEP.AutoSwitchFrom		= true
+SWEP.Weight			= 5
+SWEP.AutoSwitchTo	= false
+SWEP.AutoSwitchFrom	= false
 
-SWEP.Primary.Recoil			= 5
-SWEP.Primary.ClipSize		= 5
-SWEP.Primary.Delay			= 0.1
-SWEP.Primary.DefaultClip	= 30
+SWEP.Primary.Recoil			= 0
+SWEP.Primary.ClipSize		= -1
+SWEP.Primary.Delay			= 0
+SWEP.Primary.DefaultClip	= SWEP.Primary.ClipSize * 1 // Number of mags available
 SWEP.Primary.Automatic		= false
-SWEP.Primary.Ammo			= "XBowBolt"
-SWEP.Primary.Sound 			= "Weapon_SG550.Single"
+SWEP.Primary.Ammo			= "none"
+SWEP.Primary.Sound 			= ""
 
-SWEP.ReloadTime				= 5
+SWEP.ReloadTime	= 0
 
 SWEP.Secondary.ClipSize		= -1
 SWEP.Secondary.DefaultClip	= -1
@@ -49,76 +47,86 @@ SWEP.Secondary.Ammo			= "none"
 SWEP.AimOffset = Vector(32, 8, -1)
 
 // use this to chop the scope off your gun
-SWEP.ScopeChopPos = Vector(0, 0, 0)
+SWEP.ScopeChopPos 	= Vector(0, 0, 0)
 SWEP.ScopeChopAngle = Angle(0, 0, -90)
 
-SWEP.ZoomTime = 0.4
+SWEP.ZoomTime = 0.3
 
-SWEP.MinInaccuracy = 0.33
-SWEP.MaxInaccuracy = 9
-SWEP.Inaccuracy = SWEP.MaxInaccuracy
-SWEP.InaccuracyDecay = 0.1
-SWEP.AccuracyDecay = 0.3
-SWEP.InaccuracyPerShot = 7
-SWEP.InaccuracyCrouchBonus = 1.7
-SWEP.InaccuracyDuckPenalty = 6
-SWEP.InaccuracyAimLimit = 4
+SWEP.MinInaccuracy 			= 0.33
+SWEP.MaxInaccuracy 			= 9
+SWEP.Inaccuracy 			= SWEP.MaxInaccuracy
+SWEP.InaccuracyDecay 		= 0.1
+SWEP.AccuracyDecay 			= 0.3
+SWEP.InaccuracyPerShot		= 7
+SWEP.InaccuracyCrouchBonus 	= 1.7
+SWEP.InaccuracyDuckPenalty 	= 6
+SWEP.InaccuracyAimLimit 	= 4
 
-SWEP.StaminaDrain = 0.004
-SWEP.StaminaJumpDrain = 0.1
+SWEP.StaminaDrain 		= 0.004
+SWEP.StaminaJumpDrain 	= 0.1
 
 SWEP.HasScope = false
 
-SWEP.Class = "MG"
+SWEP.Class 		= "MG"
 SWEP.FlashClass = "MG"
-SWEP.Launcher = false
+SWEP.Launcher 	= false
 
-SWEP.RecoilAxis = Vector(0,0,0)
-SWEP.RecoilScale = 0.5
-SWEP.RecoilDamping = 0.25
-
-
+SWEP.RecoilAxis 	= Vector(0,0,0)
+SWEP.RecoilScale 	= 0.5
+SWEP.RecoilDamping 	= 0.25
 
 function SWEP:InitBulletData()
-	
+
+	// 7.62x39 Steel Core
+
+	local GunType 		= "Rifle" // Rifle, Pistol
+	local Ammunition 	= "AP" // Ammunition type
+	local Caliber 		= 0.762 // Diameter in cm
+	local Length 		= 39 // in cm
+	local MuzzleVel 	= 715 // Speed of the fired bullet
+	local BulletMass 	= 7.9 // Weight in Grams
+
+	if GunType == "Rifle" then
+		Length = Length * 0.46
+	elseif GunType == "Pistol" then
+		Length = Length * 0.52
+	end
+
+	local FrontArea
+	//local BulletVolume = Length * FrontArea
+
 	self.BulletData = {}
-	//*
-	self.BulletData["PenAera"]			=	1.2226258898987
-	self.BulletData["MaxPen"]			=	15.517221066929
-	self.BulletData["RoundVolume"]		=	16.8227276448
-	self.BulletData["KETransfert"]		=	0.1
-	self.BulletData["ProjMass"]			=	0.04143103391196
-	self.BulletData["Tracer"]			=	2.5
-	self.BulletData["Ricochet"]			=	75
-	self.BulletData["ShovePower"]		=	0.2
-	self.BulletData["FrAera"]			=	1.26677166
-	self.BulletData["Caliber"]			=	1.27
-	self.BulletData["MinPropLength"]	=	0.01
-	self.BulletData["MaxProjLength"]	=	4.16
-	self.BulletData["ProjLength"]		=	4.14
-	self.BulletData["PropLength"]		=	9.14
-	self.BulletData["PropMass"]			=	0.01852526875584
-	self.BulletData["MaxPropLength"]	=	9.16
-	self.BulletData["MuzzleVel"]		=	969.01169895961
-	self.BulletData["LimitVel"]			=	800
-	self.BulletData["MaxTotalLength"]	=	15.8
-	self.BulletData["ProjVolume"]		=	5.2444346724
-	self.BulletData["BoomPower"]		=	0.01852526875584
-	self.BulletData["DragCoef"]			=	0.0030575429584786
-	self.BulletData["MinProjLength"]	=	1.905
-	self.BulletData["Type"]				=	"AP"
-	self.BulletData["Id"] 				=	"12.7mmMG"
-	self.BulletData["InvalidateTraceback"]			= true
+
+	if Ammunition == "AP" then
+		self.BulletData["ShovePower"] 	= 0.2
+		self.BulletData["Ricochet"]		= 75
+		FrontArea 						= 3.1416 * ( Caliber / 2 )^2
+	elseif Ammunition == "HP" then
+		self.BulletData["ShovePower"] 	= 0.365
+		self.BulletData["Ricochet"]		= 90
+		FrontArea 						= 3.1416 * ( (Caliber + 0.33*Length) / 2 )^2
+	end
+
+	self.BulletData["Id"]					= "7.62mmMG" // You could literally put anything here.
+	self.BulletData["Caliber"]				= Caliber // !!
+	self.BulletData["Colour"]				= Color(255, 255, 255)
+	self.BulletData["DragCoef"]				= ( FrontArea / 10000 ) / ( BulletMass/1000 )
+	self.BulletData["FrAera"]				= FrontArea // !!
+	self.BulletData["LimitVel"]				= 800
+	self.BulletData["MuzzleVel"]			= MuzzleVel // !!
+	self.BulletData["KETransfert"]			= 0.1 // "Trasnfert" - Nice.
+	self.BulletData["PenAera"]				= FrontArea^0.85 // !!  "Aera" - Also nice.
+	self.BulletData["ProjLength"]			= Length // !!
+	self.BulletData["ProjMass"]				= BulletMass/1000 // !!
+	self.BulletData["RoundVolume"]			= Length * FrontArea // !!
+	self.BulletData["Type"]		    		= Ammunition
+	self.BulletData["InvalidateTraceback"]	= true
 
 end
-
-
-
 
 SWEP.LastAim = Vector()
 SWEP.LastThink = CurTime()
 SWEP.WasCrouched = false
-
 
 function SWEP:Think()
 
@@ -141,10 +149,18 @@ function SWEP:Think()
 		self:SetNetworkedFloat("ServerInacc", self.Inaccuracy)
 		self:SetNetworkedFloat("ServerStam", self.Owner.XCFStamina)
         
+		if self.Owner:KeyDown(IN_ATTACK2) and self.HasZoom and self:CanZoom() and not self.Zoomed then
+			self:SetZoom(true)
+		elseif not self.Owner:KeyDown(IN_ATTACK2) and self.Zoomed then
+			self:SetZoom(false)
+		end
+		
+		/*
         if self.Zoomed and not self:CanZoom() then
             self:SetZoom(false)
         end
-        
+        */
+		
 	end
 	
 end
@@ -155,7 +171,7 @@ end
 function SWEP:CanZoom()
 
     local sprinting = self.Owner:KeyDown(IN_SPEED)
-    if sprinting then return false end
+    if sprinting then return true end
     
     return true
 
@@ -264,7 +280,6 @@ function SWEP:CanPrimaryAttack()
 			return false
 		end
 	end
-	
 	return true
 end
 
@@ -320,7 +335,7 @@ function SWEP:VisRecoil()
 			rndb = rndb * 0.5
 		end
 		
-		self.Owner:ViewPunch( Angle( rnda,rndb,rnda/3 ) ) 
+		self.Owner:ViewPunch( Angle( rnda,rndb,rnda/3 ) )
     else
         local aimAng = self.Owner:EyeAngles()
         local scale = self:CalculateVisRecoilScale() * self.RecoilScale
@@ -366,10 +381,11 @@ end
 SWEP.Zoomed = false
 function SWEP:SecondaryAttack()
 
+	/*
 	if SERVER and self.HasZoom and self:CanZoom() then
 		self:SetZoom()
 	end
-
+	*/
 	return false
 	
 end
