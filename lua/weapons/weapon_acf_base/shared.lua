@@ -48,7 +48,7 @@ if true then -- Shared variables
 	SWEP.HoldType 		= ""
 	SWEP.ViewModel 		= ""
 	SWEP.WorldModel 	= ""
-
+  
 	SWEP.Spawnable	= false
 	SWEP.AdminOnly	= false
 --[[
@@ -66,7 +66,7 @@ if true then -- Shared variables
 	--]]
 --[[
 	SWEP.Secondary.Sound = ""
-
+  
 	sound.Add( 
 	{
 		name = SWEP.Primary.Sound,
@@ -601,7 +601,7 @@ function SWEP:FireAnimationEvent(pos,ang,event)
 			Effect:SetScale( self.BulletData["PropMass"] or 1 )
 			Effect:SetMagnitude( self.ReloadTime )
 			Effect:SetSurfaceProp( ACF.RoundTypes[self.BulletData["Type"]]["netid"] or 1 )	--Encoding the ammo type into a table index
-			Effect:SetMaterialIndex(5001) -- flag for effect from animation event
+			--Effect:SetMaterialIndex(5001) -- flag for effect from animation event
 		util.Effect( "ACF_SWEPMuzzleFlash", Effect, true)
 	
 		return true
