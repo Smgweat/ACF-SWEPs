@@ -4,7 +4,7 @@
 if (CLIENT) then
 	
 	SWEP.PrintName			= "M68 Impact Hand Grenade"
-	SWEP.Author				= "Alexander"
+	SWEP.Author				= ""
 	SWEP.Slot				= 4
 	SWEP.SlotPos			= 3
 	SWEP.IconLetter			= "f"
@@ -91,7 +91,7 @@ function SWEP:InitBulletData()
 	-- self.BulletData["Id"]			= "80mmM"
 	-- self.BulletData["KETransfert"]	= 0.1
 	-- self.BulletData["LimitVel"]		= 100
-	-- self.BulletData["MuzzleVel"]	= 24.160096985541
+	-- self.BulletData["MuzzleVel"]		= 24.160096985541
 	-- self.BulletData["PenAera"]		= 27.930598395101
 	-- self.BulletData["ProjLength"]	= 12
 	-- self.BulletData["ProjMass"]		= 2.8934288113354
@@ -121,7 +121,7 @@ end
 
 
 
-//*
+
 function SWEP:PrimaryAttack()
 	if self:CanPrimaryAttack() then
 		self.PressedTime = CurTime()
@@ -132,7 +132,7 @@ function SWEP:PrimaryAttack()
 	
 	self.Weapon:SetNextPrimaryFire(CurTime() + self.Primary.Delay)
 end
-//*/
+
 
 
 
@@ -147,7 +147,9 @@ function SWEP:ThinkBefore()
 			self:ShootEffects()
 			self.Weapon:EmitSound( self.Primary.Sound )
 			self.Weapon:TakePrimaryAmmo(1)
-			timer.Simple(0.35, function() self:FireBullet() end)
+			if self:IsValid() then
+				timer.Simple(0.35, function() self:FireBullet() end)
+			end
 		end
 		
 		self.PressedDuration = nil
@@ -159,6 +161,6 @@ end
 
 
 function SWEP:ShootEffects()
-	self:SendWeaponAnim( ACT_VM_THROW )		// View model animation
-	self.Owner:SetAnimation( PLAYER_ATTACK1 )	// 3rd Person Animation
+	self:SendWeaponAnim( ACT_VM_THROW )		-- View model animation
+	self.Owner:SetAnimation( PLAYER_ATTACK1 )	-- 3rd Person Animation
 end

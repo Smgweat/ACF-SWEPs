@@ -20,7 +20,7 @@ SWEP.Base				= "weapon_acf_grenade"
 SWEP.ViewModelFlip		= false
 SWEP.ViewModelFOV       = 65
 
-SWEP.Spawnable			= true
+SWEP.Spawnable			= false
 SWEP.AdminSpawnable		= false
 SWEP.Category			= "ACF"
 SWEP.ViewModel 			= "models/weapons/cstrike/c_eq_smokegrenade.mdl"

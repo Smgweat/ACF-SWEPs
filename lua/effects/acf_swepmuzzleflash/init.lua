@@ -1,9 +1,9 @@
 
    
- /*--------------------------------------------------------- 
+ --[[------------------------------------------------------- 
     Initializes the effect. The data is a table of data  
     which was passed from the server. 
- ---------------------------------------------------------*/ 
+ -------------------------------------------------------]]-- 
  function EFFECT:Init( data ) 
 	
 	local Gun = data:GetEntity()
@@ -29,7 +29,7 @@
 		
 	local GunSound = Gun:GetNWString( "Sound" ) or ACF.Classes["GunClass"][Class]["sound"] or ""
 		
-	if Gun:IsValid() then
+	if Gun:IsValid() and not Gun.Owner:IsNPC() then
 	
 		local lply = false
 		if CLIENT and LocalPlayer() == Gun.Owner then
@@ -48,9 +48,9 @@
 			}
 			
 			Gun:EmitSound( GunSound, math.Clamp(SoundPressure,75,255), math.Clamp(100,15,255), 1, CHAN_WEAPON )
-			//sound.Play( GunSound, Muzzle.Pos , math.Clamp(SoundPressure,75,255), math.Clamp(100,15,255))
+			--sound.Play( GunSound, Muzzle.Pos , math.Clamp(SoundPressure,75,255), math.Clamp(100,15,255))
 			if not ((Class == "MG") or (Class == "RAC")) then
-				//sound.Play( GunSound, Muzzle.Pos , math.Clamp(SoundPressure,75,255), math.Clamp(100,15,255))
+				--sound.Play( GunSound, Muzzle.Pos , math.Clamp(SoundPressure,75,255), math.Clamp(100,15,255))
 				Gun:EmitSound( GunSound, math.Clamp(SoundPressure,75,255), math.Clamp(100,15,255), 1, CHAN_WEAPON )
 			end
 			

@@ -4,10 +4,8 @@ A much needed breath of life into [Bubbus' SWEPS](https://github.com/Bubbus/ACF-
 ### These SWEPs are configurable!
 You are completely free to make any changes you wish to the code here, there is however a configuration file located at 'lua\autorun\acf_swepconfig.lua'. It's easy to change and covers most of the global variables available. Enjoy!
 
-
 ### Notice:
 Huge thanks to Bubbus and everyone else working on ACF and XCF; both for creating something fantastic, and being willing to share it under the MIT License.
-
 
 ### To Do:
 - [x] Update acf_swepconfig to the currently modified version.

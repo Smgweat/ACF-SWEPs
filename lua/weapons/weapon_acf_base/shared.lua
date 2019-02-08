@@ -1,99 +1,160 @@
-// Credit to Bubbus for all the hard work, I just changed the easy stuff.
 
 AddCSLuaFile( "shared.lua" )
-SWEP.HoldType			= "ar2"
 
-if (CLIENT) then
-	SWEP.Slot			= 0
-	SWEP.DrawCrosshair	= false
-	SWEP.Author			= "Bubbus"
-	SWEP.PrintName		= "ACF Base"
-	SWEP.Purpose		= "Why do you have this"
-	SWEP.Instructions   = "pls stop"
+if CLIENT then -- Client only variables
+
+	SWEP.Slot				= 0						-- Slot in the weapon selection menu
+	SWEP.SlotPos			= 0						-- Position in the slot
+	SWEP.DrawAmmo			= true					-- Should draw the default HL2 ammo counter
+	SWEP.AccurateCrosshair 	= true
+	SWEP.DrawCrosshair		= true					-- Should draw the default crosshair
+	SWEP.DrawWeaponInfoBox	= false					-- Should draw the weapon info box
+	SWEP.BounceWeaponIcon	= false					-- Should the weapon icon bounce?
+	SWEP.SwayScale			= 1.0					-- The scale of the viewmodel sway
+	SWEP.BobScale			= 1.0					-- The scale of the viewmodel bob
+	SWEP.UseHands 			= true
+
+	SWEP.RenderGroup		= RENDERGROUP_OPAQUE
+
+	-- Override this in your SWEP to set the icon in the weapon selection
+	SWEP.WepSelectIcon		= surface.GetTextureID( "weapons/swep" )
+
+	-- This is the corner of the speech bubble
+	SWEP.SpeechBubbleLid	= surface.GetTextureID( "gui/speech_lid" )
+
 end
 
-SWEP.Base			= "weapon_base"
-SWEP.ViewModelFlip	= false
-SWEP.ViewModelFOV	= 50
+if SERVER then -- Server only variables
 
-SWEP.Spawnable		= false
-SWEP.AdminSpawnable	= false
-SWEP.Category		= "ACF"
-SWEP.ViewModel 		= "";
-SWEP.WorldModel 	= "";
+	SWEP.Weight			= 5		-- Decides whether we should switch from/to this
+	SWEP.AutoSwitchTo	= false	-- Auto switch to if we pick it up
+	SWEP.AutoSwitchFrom	= false	-- Auto switch from if you pick up a better weapon
 
-SWEP.UseHands = false
+end
 
-SWEP.Weight			= 5
-SWEP.AutoSwitchTo	= false
-SWEP.AutoSwitchFrom	= false
+if true then -- Shared variables
 
-SWEP.Primary.Recoil			= 0
-SWEP.Primary.ClipSize		= -1
-SWEP.Primary.Delay			= 0
-SWEP.Primary.DefaultClip	= SWEP.Primary.ClipSize * 1 // Number of mags available
-SWEP.Primary.Automatic		= false
-SWEP.Primary.Ammo			= "none"
-SWEP.Primary.Sound 			= ""
+	SWEP.PrintName		= "ACF_SWEPS Base" -- 'Nice' Weapon name (Shown on HUD)
+	SWEP.Author			= ""
+	SWEP.Contact		= ""
+	SWEP.Purpose		= ""
+	SWEP.Instructions	= ""
+	
+	SWEP.Base 	  = "weapon_base"
+	SWEP.Category = "ACF"
+	
+	SWEP.ViewModelFOV	= 54
+	SWEP.ViewModelFlip	= false
+	SWEP.HoldType 		= ""
+	SWEP.ViewModel 		= ""
+	SWEP.WorldModel 	= ""
 
-SWEP.ReloadTime	= 0
+	SWEP.Spawnable	= false
+	SWEP.AdminOnly	= false
+--[[
+	SWEP.Primary.Sound = ""
 
-SWEP.Secondary.ClipSize		= -1
-SWEP.Secondary.DefaultClip	= -1
-SWEP.Secondary.Automatic	= false
-SWEP.Secondary.Ammo			= "none"
+	sound.Add( 
+	{
+		name = SWEP.Primary.Sound,
+		channel = CHAN_WEAPON,
+		volume = 1.0,
+		level = 80,
+		pitch = { 90, 110 },
+		sound = ""
+	} )
+	--]]
+--[[
+	SWEP.Secondary.Sound = ""
 
-// misnomer.  the position of the acf muzzleflash.
-SWEP.AimOffset = Vector(32, 8, -1)
+	sound.Add( 
+	{
+		name = SWEP.Primary.Sound,
+		channel = CHAN_WEAPON,
+		volume = 1.0,
+		level = 80,
+		pitch = { 90, 110 },
+		sound = ""
+	} )
+]]--
+	
+	sound.Add( 
+	{
+		name = "acf_sweps_misfire",
+		channel = CHAN_AUTO,
+		volume = { 0.9, 1.1 },
+		level = 80,
+		pitch = { 90, 110 },
+		sound = "weapons/pistol/pistol_empty.wav"
+	} )
+	
+	SWEP.Primary.Ammo 		 = "none"
+	SWEP.Primary.TPSound   	 = ""
+	SWEP.Primary.DistSound 	 = ""
+	SWEP.Primary.Delay		 = 0
+	SWEP.Primary.ClipSize 	 = -1
+	SWEP.Primary.DefaultClip = -1
+	SWEP.Primary.Automatic 	 = false
 
-// use this to chop the scope off your gun
-SWEP.ScopeChopPos 	= Vector(0, 0, 0)
-SWEP.ScopeChopAngle = Angle(0, 0, -90)
-
-SWEP.ZoomTime = 0.3
-
-SWEP.MinInaccuracy 			= 0.33
-SWEP.MaxInaccuracy 			= 9
-SWEP.Inaccuracy 			= SWEP.MaxInaccuracy
-SWEP.InaccuracyDecay 		= 0.1
-SWEP.AccuracyDecay 			= 0.3
-SWEP.InaccuracyPerShot		= 7
-SWEP.InaccuracyCrouchBonus 	= 1.7
-SWEP.InaccuracyDuckPenalty 	= 6
-SWEP.InaccuracyAimLimit 	= 4
-
-SWEP.StaminaDrain 		= 0.004
-SWEP.StaminaJumpDrain 	= 0.1
-
-SWEP.HasScope = false
-
-SWEP.Class 		= "MG"
-SWEP.FlashClass = "MG"
-SWEP.Launcher 	= false
-
-SWEP.RecoilAxis 	= Vector(0,0,0)
-SWEP.RecoilScale 	= 0.5
-SWEP.RecoilDamping 	= 0.25
+	SWEP.Secondary.Ammo 	   = "none"
+	SWEP.Secondary.TPSound     = ""
+	SWEP.Secondary.DistSound   = ""
+	SWEP.Secondary.Delay	   = 0
+	SWEP.Secondary.ClipSize    = -1
+	SWEP.Secondary.DefaultClip = -1
+	SWEP.Secondary.Automatic   = false
+	
+	SWEP.ReloadTime = 1
+	
+	SWEP.Launcher = false
+	
+	SWEP.AimOffset = Vector(32, 8, -1)
+	
+	-- Gun statistics
+	SWEP.Handling = {}
+	SWEP.Handling.Mass	   = 1 	-- Weight in grams
+	SWEP.Handling.Barrel   = 1 	-- Barrel length in milimeters
+	SWEP.Handling.Balance  = 1 	-- Recoil multiplier for this weapon
+	
+	-- Sight Options
+	SWEP.HasZoom  = false
+	SWEP.HasScope = false
+	SWEP.IronSights = false
+	SWEP.IronSightsPos = Vector(0, 0, 0)
+	SWEP.ZoomPos = Vector(2,-2,2)
+	SWEP.IronSightsAng = Angle(0, 0, 0)
+	SWEP.ZoomFOV  = 50
+	
+	-- Ammunition
+	SWEP.Ammunition	= "AP" 		-- Ammunition type
+	SWEP.GunType 	= "Rifle" 	-- For bullet length approximation
+	SWEP.Caliber 	= 1 		-- Diameter in milimeters
+	SWEP.Length 	= 1 		-- Case length in milimeters, The bullet length is estimated
+	SWEP.MuzzleVel 	= 1 		-- Speed of the fired bullet in meters per second
+	SWEP.BulletMass = 1 		-- Weight in Grams ( Not grains! )
+	
+	SWEP.Class 		= "MG"
+	SWEP.FlashClass = "MG"
+	
+end
 
 function SWEP:InitBulletData()
 
-	// 7.62x39 Steel Core
-
-	local GunType 		= "Rifle" // Rifle, Pistol
-	local Ammunition 	= "AP" // Ammunition type
-	local Caliber 		= 0.762 // Diameter in cm
-	local Length 		= 39 // in cm
-	local MuzzleVel 	= 715 // Speed of the fired bullet
-	local BulletMass 	= 7.9 // Weight in Grams
-
+	-- A band-aid to make my life easier
+	local Ammunition = self.Ammunition
+	local GunType 	 = self.GunType
+	local Caliber 	 = self.Caliber / 10 -- Conversion from mm to cm
+	local Length 	 = self.Length / 10 -- Conversion from mm to cm
+	local MuzzleVel  = self.MuzzleVel
+	local BulletMass = self.BulletMass
+	
 	if GunType == "Rifle" then
-		Length = Length * 0.46
+		Length = Length * 0.46 -- Because rounds are often measured in case length, Approximate rifle round
 	elseif GunType == "Pistol" then
-		Length = Length * 0.52
+		Length = Length * 0.52 -- Because rounds are often measured in case length, Approximate handgun round
 	end
 
 	local FrontArea
-	//local BulletVolume = Length * FrontArea
 
 	self.BulletData = {}
 
@@ -107,26 +168,72 @@ function SWEP:InitBulletData()
 		FrontArea 						= 3.1416 * ( (Caliber + 0.33*Length) / 2 )^2
 	end
 
-	self.BulletData["Id"]					= "7.62mmMG" // You could literally put anything here.
-	self.BulletData["Caliber"]				= Caliber // !!
-	self.BulletData["Colour"]				= Color(255, 255, 255)
-	self.BulletData["DragCoef"]				= ( FrontArea / 10000 ) / ( BulletMass/1000 )
-	self.BulletData["FrAera"]				= FrontArea // !!
-	self.BulletData["LimitVel"]				= 800
-	self.BulletData["MuzzleVel"]			= MuzzleVel // !!
-	self.BulletData["KETransfert"]			= 0.1 // "Trasnfert" - Nice.
-	self.BulletData["PenAera"]				= FrontArea^0.85 // !!  "Aera" - Also nice.
-	self.BulletData["ProjLength"]			= Length // !!
-	self.BulletData["ProjMass"]				= BulletMass/1000 // !!
-	self.BulletData["RoundVolume"]			= Length * FrontArea // !!
-	self.BulletData["Type"]		    		= Ammunition
-	self.BulletData["InvalidateTraceback"]	= true
+	self.BulletData["Id"]					= "7.62mmMG" 									-- This value has no meaning
+	self.BulletData["Caliber"]				= Caliber 										-- Predetermined
+	self.BulletData["Colour"]				= Color(255, 255, 255)							-- This value has no meaning
+	self.BulletData["DragCoef"]				= ( FrontArea / 10000 ) / ( BulletMass/1000 )	-- Auto determined, affects effective range
+	self.BulletData["FrAera"]				= FrontArea 									-- Predetermined
+	self.BulletData["LimitVel"]				= MuzzleVel + 100								-- Maximum velocity allowed
+	self.BulletData["MuzzleVel"]			= MuzzleVel 									-- Predetermined
+	self.BulletData["KETransfert"]			= 10.1 											-- Percentage of energy transferred on impact, 0 - 1
+	self.BulletData["PenAera"]				= FrontArea^0.85 								-- Auto determined frontal area
+	self.BulletData["ProjLength"]			= Length										-- Predetermined
+	self.BulletData["ProjMass"]				= BulletMass/1000 								-- Predetermined, converted from g to kg
+	self.BulletData["RoundVolume"]			= Length * FrontArea * 9.1						-- Auto determined
+	self.BulletData["Type"]		    		= Ammunition									-- Predetermined
+	self.BulletData["InvalidateTraceback"]	= true											-- Unknown
+	self.BulletData["Tracer"]				= 2.5
+	self.BulletData["ShovePower"]			= 1												-- 0.8 may be better
 
 end
 
 SWEP.LastAim = Vector()
 SWEP.LastThink = CurTime()
 SWEP.WasCrouched = false
+
+function SWEP:Initialize()
+	
+	print( "Init_Swep" )
+	print( "Swep_Type", self.HoldType )
+	
+	self:SetHoldType( self.HoldType )
+	
+	if self.HoldType == "ar2" then
+		print( "Spawned weapon type AR2" )
+		self:SetWeaponHoldType( 'ar2' )
+	end
+	
+	if self.HoldType == "smg" then
+		print( "Spawned weapon type SMG" )
+		self:SetWeaponHoldType( 'smg' )
+	end
+	
+	if self.HoldType == "pistol" then
+		print( "Spawned weapon type Pistol" )
+		self:SetWeaponHoldType( 'pistol' )
+	end
+	
+	if SERVER then
+		self:SetNPCMinBurst( 10 )			
+		self:SetNPCMaxBurst( self.ClipSize )
+		self:SetNPCFireRate( self.Primary.Delay )	
+	end
+
+	self:InitBulletData()
+	self:UpdateFakeCrate()
+	
+	self.RecoilShock = Angle( 0, 0, 0 )
+	
+	if SERVER and self.BulletData.IsShortForm and not self.IsGrenadeWeapon then
+		self.BulletData = ACF_ExpandBulletData(self.BulletData)
+	end
+	
+	if SERVER then
+		self.BulletData.OnEndFlight = self.CallbackEndFlight
+	end
+	
+end
+
 
 function SWEP:Think()
 
@@ -136,6 +243,10 @@ function SWEP:Think()
 	
 	if CLIENT then
 		self:ZoomThink()
+		
+		self.DrawCrosshair	= GetConVar("acfsweps_showHLCrosshair"):GetBool()
+		self.ViewModelFOV	= GetConVar("acfsweps_viewmodelFOV"):GetInt()
+		
 	end
 	
 	
@@ -146,7 +257,7 @@ function SWEP:Think()
 	
 	
 	if SERVER then
-		self:SetNetworkedFloat("ServerInacc", self.Inaccuracy)
+		--self:SetNetworkedFloat("ServerInacc", self.Inaccuracy)
 		self:SetNetworkedFloat("ServerStam", self.Owner.XCFStamina)
         
 		if self.Owner:KeyDown(IN_ATTACK2) and self.HasZoom and self:CanZoom() and not self.Zoomed then
@@ -155,18 +266,30 @@ function SWEP:Think()
 			self:SetZoom(false)
 		end
 		
-		/*
+		--[[
         if self.Zoomed and not self:CanZoom() then
             self:SetZoom(false)
         end
-        */
+        --]]
 		
 	end
 	
+	-- Determine if this is a client on a local server, or playing online.
+	if ( (game.SinglePlayer() && SERVER) || ( !game.SinglePlayer() && CLIENT && IsFirstTimePredicted() ) ) then
+	
+		if self.RecoilShock == nil then self.RecoilShock = Angle( 0, 0, 0 ) end
+		
+		-- Smooth recoil function.
+		if not self.Owner:IsNPC() and math.abs(self.RecoilShock.p) + math.abs(self.RecoilShock.y) > 0.1 then
+			self.Owner:SetEyeAngles( self.Owner:EyeAngles() + self.RecoilShock * 0.2 )
+			self.RecoilShock = self.RecoilShock * 0.8
+		else
+			self.RecoilShock = Angle( 0, 0, 0 )
+		end
+	
+	end
+	
 end
-
-
-
 
 function SWEP:CanZoom()
 
@@ -176,9 +299,6 @@ function SWEP:CanZoom()
     return true
 
 end
-
-
-
 
 function SWEP:SetZoom(zoom)
 
@@ -192,14 +312,6 @@ function SWEP:SetZoom(zoom)
 	if SERVER then self:SetNetworkedBool("Zoomed", self.Zoomed) end
 	
 	if self.Zoomed then
-    
-		self.cachedmin = self.cachedmin or self.MinInaccuracy
-		self.cacheddecayin = self.cacheddecayin or self.InaccuracyDecay
-		self.cacheddecayac = self.cacheddecayac or self.AccuracyDecay
-		
-		self.MinInaccuracy = self.MinInaccuracy * self.ZoomInaccuracyMod
-		self.InaccuracyDecay = self.InaccuracyDecay * self.ZoomDecayMod
-		self.AccuracyDecay = self.AccuracyDecay * self.ZoomDecayMod
 		
 		if SERVER then 
             self:SetOwnerZoomSpeed(true)
@@ -211,10 +323,6 @@ function SWEP:SetZoom(zoom)
 		self.MinInaccuracy = self.cachedmin
 		self.InaccuracyDecay = self.cacheddecayin
 		self.AccuracyDecay = self.cacheddecayac
-		
-		self.cachedmin = nil
-		self.cacheddecayin = nil
-		self.cacheddecayac = nil
 		
 		if SERVER then 
             self:SetOwnerZoomSpeed(false)
@@ -252,35 +360,51 @@ end
 
 
 
-
+--[[---------------------------------------------------------
+	Name: SWEP:Holster( weapon_to_swap_to )
+	Desc: Weapon wants to holster
+	RetV: Return true to allow the weapon to holster
+-----------------------------------------------------------]]
 function SWEP:Holster()
 	
     self:SetOwnerZoomSpeed(false)
     self.LastAmmoCountAppliedRecoil = nil
-	
+	self.RecoilShock = Angle( 0, 0, 0 )
 	return true
     
 end
 
 
-
-
 function SWEP:CanPrimaryAttack()
 	if self.Weapon:GetNetworkedBool( "reloading", false ) then return false end
-	if not (ACF.SWEP.NoclipShooting or self.Owner:GetMoveType() == MOVETYPE_WALK or self.Owner:InVehicle()) then return false end
 	
-	if CurTime() < self.Weapon:GetNextPrimaryFire() then return end
+	if not self.Owner:IsNPC() and not (ACF.SWEP.NoclipShooting or self.Owner:GetMoveType() == MOVETYPE_WALK or self.Owner:InVehicle()) then return false end
+	
+	if CurTime() < self.Weapon:GetNextPrimaryFire() then return false end
+	
 	if self.Primary.ClipSize < 0 then
 		local ammoct = self.Owner:GetAmmoCount( self.Primary.Ammo )
 		if ammoct <= 0 then return false end
 	else
 		local clip = self.Weapon:Clip1()
 		if clip <= 0 then
-			self.Weapon:EmitSound( "Weapon_Pistol.Empty", 100, math.random(90,120) )
-			return false
+			if self.Owner:IsNPC() then
+			
+				return true
+			
+			else
+			
+				self.Weapon:EmitSound( "acf_sweps_misfire" )
+				self:SetNextPrimaryFire( CurTime() + 0.5 )
+
+				return false
+				
+			end
 		end
 	end
+	
 	return true
+	
 end
 
 
@@ -297,24 +421,35 @@ end
 
 
 function SWEP:PrimaryAttack()
+
 	if self:CanPrimaryAttack() then
-		self.Weapon:TakePrimaryAmmo(1)
+	
+		if self.Weapon:Clip1() > 0 or not self.Owner:IsNPC() then
+			self.Weapon:TakePrimaryAmmo(1)
+		end
 		
 		self.Weapon:SendWeaponAnim( ACT_VM_PRIMARYATTACK )
-		--self.Owner:MuzzleFlash()
+		self.Owner:MuzzleFlash()
 		self.Owner:SetAnimation( PLAYER_ATTACK1 )
 		
 		if SERVER then
-			--self.Weapon:EmitSound( self.Primary.Sound )
+			
+			if self.Owner:IsNPC() then
+				self.Weapon:EmitSound( self.Primary.TPSound, 100, math.random(90,110) )
+			end
 			
 			self:FireBullet()
+			
 		end
+		
 		self:VisRecoil()
 		
 		self:AddInaccuracy(self.InaccuracyPerShot)
+		
+		self.Weapon:SetNextPrimaryFire(CurTime() + self.Primary.Delay)
+		
 	end
 	
-	self.Weapon:SetNextPrimaryFire(CurTime() + self.Primary.Delay)
 end
 
 
@@ -323,26 +458,17 @@ function SWEP:VisRecoil()
 
 	if self:Clip1() == self.LastAmmoCountAppliedRecoil then return end
 
-	if SERVER then
-    
-        local punchScale = self.RecoilScale * self.RecoilScale * 16
-    
-		local rnda = -punchScale
-		local rndb = math.random(-punchScale, punchScale) 
+	if ( (game.SinglePlayer() && SERVER) || ( !game.SinglePlayer() && CLIENT && IsFirstTimePredicted() ) ) then
+	
+		local punchScale = ( ( self.BulletMass * 0.1 * self.MuzzleVel ) / ( self.Handling.Mass ) )
 		
-		if self.Zoomed then
-			rnda = rnda * 0.5
-			rndb = rndb * 0.5
-		end
+		local rnda = ( -punchScale * math.random() ) * 10
+		local rndb = ( math.random() * punchScale - punchScale / 2 ) * 10
 		
-		self.Owner:ViewPunch( Angle( rnda,rndb,rnda/3 ) )
-    else
-        local aimAng = self.Owner:EyeAngles()
-        local scale = self:CalculateVisRecoilScale() * self.RecoilScale
-        local addAxis = (aimAng:Right() + VectorRand() * 0.3) * scale
-        self.LastAmmoCountAppliedRecoil = self:Clip1()
+		if self.RecoilShock == nil then self.RecoilShock = Angle( 0, 0, 0 ) end
 		
-        self.RecoilAxis = self.RecoilAxis + addAxis * 600
+		self.RecoilShock = self.RecoilShock + Angle( rnda, rndb, 0 )
+		
 	end
 end
 
@@ -375,17 +501,15 @@ function SWEP:CalculateVisRecoilScale()
 
 end
 
-
-
-
 SWEP.Zoomed = false
+
 function SWEP:SecondaryAttack()
 
-	/*
+	--[[
 	if SERVER and self.HasZoom and self:CanZoom() then
 		self:SetZoom()
 	end
-	*/
+	--]]
 	return false
 	
 end
@@ -398,18 +522,20 @@ function SWEP:Reload()
 
 	if self.Zoomed then return false end
 	
-	if self:Clip1() < self.Primary.ClipSize and self.Owner:GetAmmoCount( self.Primary.Ammo ) > 0 then
+	if self:Clip1() < self.Primary.ClipSize and ( self.Owner:IsNPC() or self.Owner:GetAmmoCount( self.Primary.Ammo ) > 0 ) then
+	
 		if SERVER then
 			self.Weapon:SetNetworkedBool( "reloading", true )
-			//self.Weapon:SetVar( "reloadtimer", CurTime() + self.ReloadTime )
+			--self.Weapon:SetVar( "reloadtimer", CurTime() + self.ReloadTime )
 			timer.Simple(self.ReloadTime, function() if IsValid(self) then self.Weapon:SetNetworkedBool( "reloading", false ) end end)
 			self.Weapon:SetNextPrimaryFire(CurTime() + self.ReloadTime)
-			self.Owner:DoReloadEvent()
+			--self.Owner:DoReloadEvent()
+			self.Owner:SetAnimation( ACT_RELOAD )
 		end
 		
 		local reloaded = self:DefaultReload( ACT_VM_RELOAD )
 	
-		//print("do reload!")
+		--print("do reload!")
 	
 		self:SetInaccuracy(self.MaxInaccuracy)
 	end
@@ -426,9 +552,11 @@ function SWEP.randvec(min, max)
 					min.z+math.random()*(max.z-min.z))
 end
 
-// Randomly perturbs a vector within a cone of Degs degrees.
-// Gaussian distribution, NOT uniform!
+-- Randomly perturbs a vector within a cone of Degs degrees.
+-- Gaussian distribution, NOT uniform!
+
 SWEP.cachedvec = Vector()
+
 function SWEP:inaccuracy(vec, degs)
 	local rand = self.randvec(vec, self.cachedvec)
 	self.cachedvec = rand:Cross(VectorRand()):GetNormalized()
@@ -446,8 +574,8 @@ end
 
 function SWEP:ShootEffects()
  
-	self:SendWeaponAnim( ACT_VM_PRIMARYATTACK )	// View model animation
-	self.Owner:SetAnimation( PLAYER_ATTACK1 )		// 3rd Person Animation
+	self:SendWeaponAnim( ACT_VM_PRIMARYATTACK )	-- View model animation
+	self.Owner:SetAnimation( PLAYER_ATTACK1 )   -- 3rd Person Animation
 
 end
 
@@ -456,11 +584,14 @@ end
 function SWEP:FireAnimationEvent(pos,ang,event)
 	
 	local curtime = CurTime()
+	
 	if not self.NextFlash then self.NextFlash = curtime - 0.05 end
 	
 	-- firstperson muzzleflash
 	if ( event == 5001 ) then 
+	
 		if self.NextFlash > curtime then return true end
+		
 		self.NextFlash = curtime + 0.05
 	
 		local Effect = EffectData()
@@ -478,7 +609,9 @@ function SWEP:FireAnimationEvent(pos,ang,event)
 	
 	-- Disable thirdperson muzzle flash
 	if ( event == 5003 ) then
+	
 		if self.NextFlash > curtime then return true end
+		
 		self.NextFlash = curtime + 0.05
 	
 		local Effect = EffectData()
@@ -492,13 +625,12 @@ function SWEP:FireAnimationEvent(pos,ang,event)
 		util.Effect( "ACF_SWEPMuzzleFlash", Effect, true)
 	
 		return true
+		
 	end
 	
 	--if ( event == 6002 ) then return true end
 	
 end
-
-
 
 
 function SWEP:UpdateTracers(overrideCol)
@@ -517,23 +649,5 @@ function SWEP:UpdateTracers(overrideCol)
     end
     
     self:UpdateFakeCrate()
-    
-end
-
-
-
-
-function SWEP:Equip(ply)
-
-	self.Owner = ply
-    
-	self:SetNextPrimaryFire(CurTime())
-    
-    self:UpdateTracers()
-    
-    self.RecoilAxis = Vector(0,0,0)
-	self.LastAmmoCountAppliedRecoil = nil
-    
-    self:SetOwnerZoomSpeed(false)
     
 end

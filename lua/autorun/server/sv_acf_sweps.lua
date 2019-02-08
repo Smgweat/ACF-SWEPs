@@ -20,17 +20,18 @@ ACF.SWEP = ACF.SWEP or {}
 ACF.SWEP.PlyBullets = ACF.SWEP.PlyBullets or {}
 local bullets = ACF.SWEP.PlyBullets
 
-
-
 function ACF_CreateBulletSWEP( BulletData, Swep, LagComp )
 
 	if not IsValid(Swep) then error("Tried to create swep round with no swep or owner!") return end
 	
-	local owner = Swep:IsPlayer() and Swep or Swep.Owner or BulletData.Owner or error("Tried to create swep round with unowned swep!")
-
+	--local owner = Swep:IsPlayer() and Swep or Swep.Owner or BulletData.Owner or error("Tried to create swep round with unowned swep!")
+	
+	local owner = BulletData["Owner"]
+	
+	print(owner)
 	BulletData = table.Copy(BulletData)
 	
-	if LagComp then
+	if LagComp and not owner:IsNPC() then
 		BulletData.LastThink = SysTime()
 		
 		BulletData.Owner = owner
@@ -51,10 +52,12 @@ function ACF_CreateBulletSWEP( BulletData, Swep, LagComp )
 	if IsValid(owner) then
         BulletData.Filter[#BulletData.Filter + 1] = owner
         
-        local vehicle = owner:GetVehicle()
-        if IsValid(vehicle) then
-            BulletData.Filter[#BulletData.Filter + 1] = vehicle
-        end
+		if not owner:IsNPC() then
+			local vehicle = owner:GetVehicle()
+			if IsValid(vehicle) then
+				BulletData.Filter[#BulletData.Filter + 1] = vehicle
+			end
+		end
     end
 	
 	ACF_CustomBulletLaunch(BulletData)
@@ -77,7 +80,10 @@ function ACF_SWEP_PlayerTickSimulate(ply, move)
 	
 	for k, bullet in pairs(plyBullets) do
 		--print("sim bullet ", k)
-		CalcFlight( bullet.Index, bullet )
+		if bullet and bullet.Index then
+			print ( bullet.Index )
+			CalcFlight( bullet.Index, bullet )
+		end
 	end
 	
 	ply:LagCompensation(false)
@@ -87,11 +93,8 @@ end
 if ACF.Version and ACF.Version < 506 then ErrorNoHalt("ACF SWEPs need ACF v506 or greater to use lag compensation!  Please update ACF!")
 else hook.Add("PlayerTick", "ACF_SWEP_PlayerTickSimulate", ACF_SWEP_PlayerTickSimulate) end
 
-
-
-
 function ACF_SWEP_PlayerDisconnected(ply)
-	//print("plyDisconn", ply)
+	--print("plyDisconn", ply)
 	if not IsValid(ply) then return end
 
 	local plyBullets = bullets[ply]
@@ -106,6 +109,7 @@ function ACF_SWEP_PlayerDisconnected(ply)
 	
 	bullets[ply] = nil
 end
+
 hook.Add( "PlayerDisconnected", "ACF_SWEP_PlayerDisconnected", ACF_SWEP_PlayerDisconnected)
 
 
@@ -123,13 +127,13 @@ end
 
 function ACF_BulletLaunch(BData)
 
-	ACF.CurBulletIndex = ACF.CurBulletIndex + 1		--Increment the index
+	ACF.CurBulletIndex = ACF.CurBulletIndex + 1	--Increment the index
 	if ACF.CurBulletIndex > ACF.BulletIndexLimt then
 		ACF.CurBulletIndex = 1
 	end
 
 	local cvarGrav = GetConVar("sv_gravity")
-	BData.Accel = Vector(0,0,cvarGrav:GetInt()*-1)			--Those are BData settings that are global and shouldn't change round to round
+	BData.Accel = Vector(0,0,cvarGrav:GetInt()*-1) --Those are BData settings that are global and shouldn't change round to round
 	BData.LastThink = BData.LastThink or SysTime()
 	BData["FlightTime"] = 0
 	--BData["TraceBackComp"] = 0
@@ -139,7 +143,7 @@ function ACF_BulletLaunch(BData)
 		BData["InitTime"] = SysTime()
 	end
 	
-	if not BData.TraceBackComp then											--Check the Gun's velocity and add a modifier to the flighttime so the traceback system doesn't hit the originating contraption if it's moving along the shell path
+	if not BData.TraceBackComp then	--Check the Gun's velocity and add a modifier to the flighttime so the traceback system doesn't hit the originating contraption if it's moving along the shell path
 		if IsValid(BData.Gun) then
 			BData["TraceBackComp"] = BData.Gun:GetPhysicsObject():GetVelocity():Dot(BData.Flight:GetNormalized())
 		else
@@ -167,7 +171,7 @@ end
 function ACF_CustomBulletLaunch(BData)
 
 	ACF_BulletLaunch(BData)
-	
+	--PrintTable(BData)
 	if BData.HandlesOwnIteration then
 		bullets[BData.Owner] = bullets[BData.Owner] or {}
 		local btbl = bullets[BData.Owner]
@@ -183,13 +187,13 @@ end
 
 function ACF_ExpandBulletData(bullet)
 
-	//print("expand bomb")
-	//print(debug.traceback())
+	--print( "expand bomb" )
+	--print( debug.traceback() )
 
-	/*
+	--[[
 	print("\n\nBEFORE EXPAND:\n")
 	printByName(bullet)
-	//*/
+	--]]
 
 	local toconvert = {}
 	toconvert["Id"] = 			bullet["Id"] or "12.7mmMG"
@@ -204,10 +208,10 @@ function ACF_ExpandBulletData(bullet)
 	toconvert["Data10"] = 		bullet["Tracer"] or bullet["Data10"] or 0
 	toconvert["Colour"] = 		bullet["Colour"] or Color(255, 255, 255)
 		
-	/*
+	--[[
 	print("\n\nTO EXPAND:\n")
 	printByName(toconvert)
-	//*/
+	]]--
 		
 	local rounddef = ACF.RoundTypes[bullet.Type] or error("No definition for the shell-type", bullet.Type)
 	local conversion = rounddef.convert
@@ -226,10 +230,10 @@ function ACF_ExpandBulletData(bullet)
 	ret.Accel = Vector(0,0,cvarGrav:GetInt()*-1)
 	if ret.Tracer == 0 and bullet["Tracer"] and bullet["Tracer"] > 0 then ret.Tracer = bullet["Tracer"] end
 	ret.Colour = toconvert["Colour"]
-	/*
+	--[[
 	print("\n\nAFTER EXPAND:\n")
 	printByName(ret)
-	//*/
+	]]--
 	
 	return ret
 

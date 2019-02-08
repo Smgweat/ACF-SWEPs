@@ -1,30 +1,12 @@
 
 AddCSLuaFile( "cl_init.lua" )
+AddCSLuaFile( "ai_translations.lua" )
+AddCSLuaFile( "sh_anim.lua" )
 AddCSLuaFile( "shared.lua" )
 
-include('shared.lua')
-
-function SWEP:Initialize()
-	self:SetWeaponHoldType(self.HoldType)
-	if IsValid(self:GetParent()) then
-		self.Owner = self:GetParent()
-		self:SetOwner(self:GetParent())
-	end
-	self:InitBulletData()
-	self:UpdateFakeCrate()
-	
-	if SERVER and self.BulletData.IsShortForm and not self.IsGrenadeWeapon then
-		//print("expand dong")
-		self.BulletData = ACF_ExpandBulletData(self.BulletData)
-	end
-	
-	if SERVER then
-		self.BulletData.OnEndFlight = self.CallbackEndFlight
-	end
-end
-
-
-
+include( "ai_translations.lua" )
+include( "sh_anim.lua" )
+include( "shared.lua" )
 
 function SWEP:UpdateFakeCrate(realcrate)
 
@@ -37,8 +19,6 @@ function SWEP:UpdateFakeCrate(realcrate)
 	self.BulletData["Crate"] = self.FakeCrate:EntIndex()
 	self:SetNWString( "Sound", self.Primary.Sound )
 end
-
-
 
 
 function SWEP:OnRemove()
@@ -56,7 +36,7 @@ local nopen = {HE = true, SM = true, FLR = true}
 function SWEP:DoAmmoStatDisplay()
     
     local bdata = self.BulletData
-
+	PrintTable( bdata ) 
 	if bdata.IsShortForm then
 		bdata = ACF_ExpandBulletData(table.Copy(bdata))
 	end
@@ -96,31 +76,41 @@ end
 
 
 function SWEP:Deploy()
-
-	self:DoAmmoStatDisplay()
-    
-    if self.Zoomed then
-        self:SetZoom(false)
+	print (self.Owner)
+	self.RecoilShock = Angle( 0, 0, 0 )
+	--SetCurrentWeaponProficiency(WEAPON_PROFICIENCY_PERFECT)
+	if not self.Owner:IsNPC() then
+		self:DoAmmoStatDisplay()
+		
+		if self.Zoomed then
+			self:SetZoom(false)
+		end
     end
-    
+	--PrintTable(getmetatable(self))
 end
 
 
 function SWEP:FireBullet()
 
 	local MuzzlePos = self.Owner:GetShootPos()
+	
+	print( self.Owner, self.Owner:GetShootPos(), self.Owner:GetPos() )
+
 	local MuzzleVec = self.Owner:GetAimVector()
 	local angs = self.Owner:EyeAngles()	
 	local MuzzlePos2 = MuzzlePos + angs:Forward() * self.AimOffset.x + angs:Right() * self.AimOffset.y
-	local MuzzleVecFinal = self:inaccuracy(MuzzleVec, self.Inaccuracy)
+	local MuzzleVecFinal = MuzzleVec --self:inaccuracy(MuzzleVec, self.Inaccuracy)
+	
+	print( MuzzleVecFinal )
 	
 	self.BulletData["Pos"] = MuzzlePos
-	//print ( self.BulletData["MuzzleVel"] )
-	//print ( MuzzleVec )
-	//print ( MuzzleVecFinal )
+	--print ( self.BulletData["MuzzleVel"] )
+	--print ( MuzzleVec )
+	--print ( MuzzleVecFinal )
 	self.BulletData["Flight"] = ( self.BulletData["MuzzleVel"] * MuzzleVecFinal * 52.4590163934 ) + self.Owner:GetVelocity()
-	//print ( self.BulletData["Flight"] )
+	print ( self.BulletData["Flight"] )
 	self.BulletData["Owner"] = self.Owner
+	print ( self.BulletData["Owner"] )
 	self.BulletData["Gun"] = self
 
 	if self.BeforeFire then
@@ -157,6 +147,89 @@ function SWEP.CallbackEndFlight(index, bullet, trace)
 		
 		Effect:SetOrigin(pos - trace.Normal)
 		Effect:SetNormal(dir)
-		Effect:SetRadius((bullet.ProjMass * (bullet.Flight:Length() / 39.37)) / 10) // ditched realism for more readability at range
-	util.Effect( "acf_sniperimpact", Effect, true, true)
+		Effect:SetRadius((bullet.ProjMass * (bullet.Flight:Length() / 39.37)) / 10) -- ditched realism for more readability at range
+		util.Effect( "acf_sniperimpact", Effect, true, true)
 end
+
+--[[---------------------------------------------------------
+	Name: Equip
+	Desc: A player or NPC has picked the weapon up
+-----------------------------------------------------------]]
+function SWEP:Equip(ply)
+
+	self.Owner = ply
+    
+	if self.Owner:IsNPC() then
+		self.Owner:SetCurrentWeaponProficiency( WEAPON_PROFICIENCY_PERFECT  )
+	end
+	
+	--self:SetHoldType( self.HoldType )
+	
+	self:SetNextPrimaryFire( CurTime() )
+    
+    --self:UpdateTracers()
+    
+    self.RecoilAxis = Vector(0,0,0)
+	
+	self.LastAmmoCountAppliedRecoil = nil
+    
+    self:SetOwnerZoomSpeed(false)
+    
+end
+
+--[[---------------------------------------------------------
+	Name: OnDrop
+	Desc: Weapon was dropped
+-----------------------------------------------------------]]
+function SWEP:OnDrop()
+
+
+
+end
+
+--[[---------------------------------------------------------
+	Name: ShouldDropOnDie
+	Desc: Should this weapon be dropped when its owner dies?
+-----------------------------------------------------------]]
+function SWEP:ShouldDropOnDie()
+
+	return true
+	
+end
+
+--[[---------------------------------------------------------
+	Name: GetCapabilities
+	Desc: For NPCs, returns what they should try to do with it.
+-----------------------------------------------------------]]
+function SWEP:GetCapabilities()
+
+	return CAP_WEAPON_RANGE_ATTACK1
+
+end
+
+--[[---------------------------------------------------------
+	Name: NPCShoot_Secondary
+	Desc: NPC tried to fire secondary attack
+-----------------------------------------------------------]]
+function SWEP:NPCShoot_Secondary( shootPos, shootDir )
+
+	self:SecondaryAttack()
+
+end
+
+--[[---------------------------------------------------------
+	Name: NPCShoot_Secondary
+	Desc: NPC tried to fire primary attack
+-----------------------------------------------------------]]
+function SWEP:NPCShoot_Primary( shootPos, shootDir )
+
+	self:PrimaryAttack()
+
+end
+
+-- These tell the NPC how to use the weapon
+AccessorFunc( SWEP, "fNPCMinBurst",		"NPCMinBurst" )
+AccessorFunc( SWEP, "fNPCMaxBurst",		"NPCMaxBurst" )
+AccessorFunc( SWEP, "fNPCFireRate",		"NPCFireRate" )
+AccessorFunc( SWEP, "fNPCMinRestTime",	"NPCMinRest" )
+AccessorFunc( SWEP, "fNPCMaxRestTime",	"NPCMaxRest" )

@@ -20,7 +20,7 @@ end
 SWEP.Base				= "weapon_acf_base"
 SWEP.ViewModelFlip			= false
 
-SWEP.Spawnable			= true
+SWEP.Spawnable			= false
 SWEP.AdminSpawnable		= false
 SWEP.Category			= "ACF"
 SWEP.ViewModel 			= "models/weapons/v_RPG.mdl";

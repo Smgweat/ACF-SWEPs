@@ -1,20 +1,17 @@
-include('shared.lua')
 
-SWEP.DrawAmmo			= true
-SWEP.DrawWeaponInfoBox	= true
-SWEP.BounceWeaponIcon   = true
-SWEP.SwayScale			= 1					-- The scale of the viewmodel sway
-SWEP.BobScale			= 0.5					-- The scale of the viewmodel bob
-SWEP.IsACF				= true
-
-
-
+include( "ai_translations.lua" )
+include( "sh_anim.lua" )
+include( "shared.lua" )
 
 function SWEP:Initialize()
 
 	if not IsValid(self.Owner) then return end
-	self:SetWeaponHoldType( self.HoldType )
-	self.defaultFOV = self.Owner:GetFOV()
+	--self:SetHoldType( self.HoldType )
+	if self.Owner:IsNPC() then
+		self.defaultFOV = 0
+	else
+		self.defaultFOV = self.Owner:GetFOV()
+	end
 	self.lastaccuracy = self.MaxInaccuracy
 	self.wasReloading = false
 	self.reloadBegin = 0
@@ -23,9 +20,9 @@ function SWEP:Initialize()
 	
 	self.timeDiff = 0
 	self.lastServRecv = CurTime() - 0.1
-	self.lastServInacc = self.MaxInaccuracy
-	self.curServInacc = self.MaxInaccuracy
-	self.curVisInacc = self.MaxInaccuracy
+	self.lastServInacc = 1--self.MaxInaccuracy
+	self.curServInacc = 1--self.MaxInaccuracy
+	self.curVisInacc = 1--self.MaxInaccuracy
 	self.smoothFactor = 0
 	
 	self.fromPos = Vector(0,0,0)
@@ -40,14 +37,11 @@ function SWEP:Initialize()
     
 end
 
-
-
-
 function SWEP:ZoomThink()
 	local zoomed = self:GetNetworkedBool("Zoomed")
-	//Msg(zoomed)
+	--Msg(zoomed)
 	if zoomed != self.Zoomed then
-		//print(zoomed, "has changed!!11")
+		--print(zoomed, "has changed!!11")
 		self.Zoomed = zoomed
 		
 		if zoomed then
@@ -73,9 +67,9 @@ function SWEP:ZoomThink()
 			self.cacheddecayin = self.cacheddecayin or self.InaccuracyDecay
 			self.cacheddecayac = self.cacheddecayac or self.AccuracyDecay
 			
-			self.MinInaccuracy = self.MinInaccuracy * self.ZoomInaccuracyMod
-			self.InaccuracyDecay = self.InaccuracyDecay * self.ZoomDecayMod
-			self.AccuracyDecay = self.AccuracyDecay * self.ZoomDecayMod
+			self.MinInaccuracy = self.MinInaccuracy --* self.ZoomInaccuracyMod
+			self.InaccuracyDecay = self.InaccuracyDecay --* self.ZoomDecayMod
+			self.AccuracyDecay = self.AccuracyDecay --* self.ZoomDecayMod
 		else			
 			if self.cachedmin then
 				self.MinInaccuracy = self.cachedmin
@@ -172,11 +166,13 @@ end
 
 local function GetCurrentACFSWEP()
 
-    if not (LocalPlayer():Alive() or LocalPlayer():InVehicle()) then return end
+    if not ( LocalPlayer():Alive() or LocalPlayer():InVehicle() ) then return end
+	
 	local self = LocalPlayer():GetActiveWeapon()
-	if not self.IsACF then return end
+	
+	if not ( self and self.BulletData ) then return end
 
-	if not (self.Owner:Alive() or self.Owner:InVehicle()) then return end
+	if not ( self.Owner:Alive() or self.Owner:InVehicle() ) then return end
     
     return self
 
@@ -188,13 +184,12 @@ end
 
 hook.Add("HUDPaint", "ACFWep_HUD", function()
 
+	local self = LocalPlayer():GetActiveWeapon()
 	
-	local self = GetCurrentACFSWEP()
-	if not self then return end
-
+	if not ( self and self.BulletData ) then return end
 
 	if not (self.Owner:Alive() or self.Owner:InVehicle()) then return end
-
+	
 	local drawcircle = true
 	
 	local scrpos
@@ -206,22 +201,23 @@ hook.Add("HUDPaint", "ACFWep_HUD", function()
 		scrpos = trace.HitPos:ToScreen()
 	end
 	
-	local isReloading = self.Weapon:GetNetworkedBool( "reloading", false )
-	local servstam = self.Weapon:GetNetworkedFloat("ServerStam", 0)
+	--[[
+	local isReloading = self:GetNetworkedBool( "reloading", false )
+	local servstam = self:GetNetworkedFloat("ServerStam", 0)
 	
-	local servinacc = self.Weapon:GetNetworkedFloat("ServerInacc", self.MaxInaccuracy)
+	local servinacc = self:GetNetworkedFloat("ServerInacc", self.MaxInaccuracy)
 	if servinacc ~= self.curServInacc then
-		self.timeDiff = CurTime() - self.lastServRecv
+		self.timeDiff = CurTime() - self.lastServRecv or CurTime()
 		self.lastServRecv = CurTime()
 		self.lastServInacc = self.curServInacc
 		self.curServInacc = servinacc
-		self.curVisInacc = self.lastServInacc
+		self.curVisInacc = 1--self.lastServInacc
 		self.smoothFactor = (self.curServInacc - self.lastServInacc) * self.timeDiff
 	end
 
-	self.curVisInacc = math.Clamp(self.curVisInacc + self.smoothFactor, math.min(self.lastServInacc, self.curServInacc), math.max(self.lastServInacc, self.curServInacc))
+	--self.curVisInacc = math.Clamp(self.curVisInacc + self.smoothFactor, math.min(self.lastServInacc, self.curServInacc), math.max(self.lastServInacc, self.curServInacc))
 
-	local aimRadius = drawcircle and ScrW() / 2 * self.curVisInacc / self.Owner:GetFOV()
+	local aimRadius = drawcircle and ScrW() / 2 --* self.curVisInacc / self.Owner:GetFOV()
 	local fractLeft = 1
 	
 	if self.PressedTime then
@@ -241,10 +237,10 @@ hook.Add("HUDPaint", "ACFWep_HUD", function()
 	end
 	self.wasReloading = isReloading
 
-	
+	--]]
 	
 	if drawcircle then
-		self:DrawReticule(scrpos, aimRadius, fractLeft, servstam)
+		self:DrawReticule( scrpos, 0, 1, self:GetNetworkedFloat("ServerStam", 0) )
 	end
 	
 	self:DrawScope()
@@ -257,11 +253,13 @@ end)
 
 
 function SWEP:ZoomTween(t)
-
-	t = (t - 0.5) * 2
-	
-	return ( ( (t + 1)^2 ) / ( t^2 + 1 ) ) / 2
-
+	if t then
+		t = (t - 0.5) * 2
+		
+		return ( ( (t + 1)^2 ) / ( t^2 + 1 ) ) / 2
+	else
+		return 0
+	end
 end
 
 
@@ -272,15 +270,15 @@ local lissay = 4
 local lissasep = math.pi / 2
 function SWEP:GetViewModelPosition( pos, ang )
 
-	if not CLIENT then return pos, ang end
+	if not CLIENT and not self.Owner:IsNPC() then return pos, ang end
 	
 	self.lastViewMod = self.lastViewMod or RealTime()
 	
 	self.lastaccuracy = self.lastaccuracy or self.MaxInaccuracy
 	
 	local time = CurTime() * 0.33
-	local accuracy = (self.Inaccuracy * 0.02 + self.lastaccuracy * 0.98) * 0.25
-	
+	--local accuracy = (self.Inaccuracy * 0.02 + self.lastaccuracy * 0.98) * 0.25
+	local accuracy = 0
 	ang = self.Owner:GetAimVector():Angle()
 	local trace = self.Owner:GetEyeTrace()
 	
@@ -296,14 +294,14 @@ function SWEP:GetViewModelPosition( pos, ang )
 	
 	local tween = self:ZoomTween(self.zoomProgress)
 
-	self.curPos = LerpVector(tween, self.fromPos, self.toPos)
+	self.curPos = LerpVector(tween, self.fromPos or Vector(0, 0, 0), self.toPos or Vector(0, 0, 0))
 	local modpos = pos + self.curPos
-	self.curAng = LerpAngle(tween, self.fromAng, self.toAng)
+	self.curAng = LerpAngle(tween, self.fromAng or Angle(0, 0, 0), self.toAng or Angle(0, 0, 0))
 	sway = sway + self.curAng
 	
 	local pos2, aim2 = LocalToWorld(self.curPos, sway, pos, ang)
 	
-	self.zoomProgress = math.Clamp(self.zoomProgress + (RealTime() - self.lastViewMod) * 1 / (self.ZoomTime or 1), 0, 1)
+	self.zoomProgress = math.Clamp(self.zoomProgress + (RealTime() - self.lastViewMod) * 1 / (self.ZoomTime or 0.3), 0, 1)
 	self.lastViewMod = RealTime()
 	
 	return pos2, aim2
