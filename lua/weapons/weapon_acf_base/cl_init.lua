@@ -12,6 +12,7 @@ function SWEP:Initialize()
 	else
 		self.defaultFOV = self.Owner:GetFOV()
 	end
+  
 	self.lastaccuracy = self.MaxInaccuracy
 	self.wasReloading = false
 	self.reloadBegin = 0
@@ -262,54 +263,9 @@ function SWEP:ZoomTween(t)
 	end
 end
 
-
-
-
 local lissax = 3
 local lissay = 4
 local lissasep = math.pi / 2
-function SWEP:GetViewModelPosition( pos, ang )
-
-	if not CLIENT and not self.Owner:IsNPC() then return pos, ang end
-	
-	self.lastViewMod = self.lastViewMod or RealTime()
-	
-	self.lastaccuracy = self.lastaccuracy or self.MaxInaccuracy
-	
-	local time = CurTime() * 0.33
-	--local accuracy = (self.Inaccuracy * 0.02 + self.lastaccuracy * 0.98) * 0.25
-	local accuracy = 0
-	ang = self.Owner:GetAimVector():Angle()
-	local trace = self.Owner:GetEyeTrace()
-	
-	local x = accuracy * math.sin(lissax * time + lissasep + time*0.01)
-	local y = accuracy * math.sin(lissay * time)
-	if self:GetNetworkedBool("Zoomed") then
-		y = y / 2 + accuracy
-	else
-		
-	end
-	local sway = Angle(y, x, 0)*0.1
-	self.lastaccuracy = accuracy * 4
-	
-	local tween = self:ZoomTween(self.zoomProgress)
-
-	self.curPos = LerpVector(tween, self.fromPos or Vector(0, 0, 0), self.toPos or Vector(0, 0, 0))
-	local modpos = pos + self.curPos
-	self.curAng = LerpAngle(tween, self.fromAng or Angle(0, 0, 0), self.toAng or Angle(0, 0, 0))
-	sway = sway + self.curAng
-	
-	local pos2, aim2 = LocalToWorld(self.curPos, sway, pos, ang)
-	
-	self.zoomProgress = math.Clamp(self.zoomProgress + (RealTime() - self.lastViewMod) * 1 / (self.ZoomTime or 0.3), 0, 1)
-	self.lastViewMod = RealTime()
-	
-	return pos2, aim2
-
-end
-
-
-
 
 hook.Add( "PreRender", "ACFWep_PreRender", function()
 
