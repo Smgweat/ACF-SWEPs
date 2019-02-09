@@ -137,7 +137,7 @@ end
 
 function EFFECT:Shockwave( Ground, SmokeColor )
 
-	print("shockwave")
+	--print("shockwave")
 
 	local Mat = Ground.MatType
 	local Radius = (1-Ground.Fraction)*self.Radius

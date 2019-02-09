@@ -28,7 +28,7 @@ local ActIndex = {
 -----------------------------------------------------------]]
 function SWEP:SetWeaponHoldType( t )
 
-	print( "Setting hold type", t )
+	--print( "Setting hold type", t )
 
 	t = string.lower( t )
 	local index = ActIndex[ t ]

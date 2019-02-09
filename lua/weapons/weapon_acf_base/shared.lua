@@ -156,7 +156,7 @@ function SWEP:InitBulletData()
 
     local FrontArea
 
-    print( "Initialized bulletdata" )
+    --print( "Initialized bulletdata" )
     self.BulletData = {}
 
     if Ammunition == "AP" then
@@ -414,7 +414,7 @@ end
 
 function SWEP:PrimaryAttack()
   
-    print( "Standard primary Attack was called " )
+    --print( "Standard primary Attack was called " )
   
     if self:CanPrimaryAttack() then
 

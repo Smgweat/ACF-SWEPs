@@ -28,7 +28,7 @@ function ACF_CreateBulletSWEP( BulletData, Swep, LagComp )
 	
 	local owner = BulletData["Owner"]
 	
-	print(owner)
+	--print(owner)
 	BulletData = table.Copy(BulletData)
 	
 	if LagComp and not owner:IsNPC() then

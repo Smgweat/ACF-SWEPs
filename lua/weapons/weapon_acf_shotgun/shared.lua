@@ -114,7 +114,7 @@ end
 function SWEP:ThinkBefore()
 	if self.Owner:KeyDown(IN_ATTACK) and self.Weapon:GetNetworkedBool( "reloading", false ) then
 		if self.Weapon:Clip1() > 0 and self.Weapon:Clip1() < self.Primary.ClipSize then
-			//print("cancelled")
+			--print("cancelled")
 			self.Weapon:SendWeaponAnim( ACT_SHOTGUN_RELOAD_FINISH )
 			self.Weapon:SetNextPrimaryFire( CurTime() + 0.5 )
 			self.Weapon:SetNetworkedBool( "reloading", false )
@@ -137,10 +137,10 @@ function SWEP:Reload()
 			self.Owner:DoReloadEvent()
 		end
 
-		//print("do shotgun reload!")
+		--print("do shotgun reload!")
 		
 		self.Weapon:SetNetworkedBool( "reloading", true )
-		//self.Weapon:SetVar( "reloadtimer", CurTime() + self.ReloadTime )
+		--self.Weapon:SetVar( "reloadtimer", CurTime() + self.ReloadTime )
 		self.Owner:DoReloadEvent()
 		self.Weapon:SendWeaponAnim( ACT_SHOTGUN_RELOAD_START )
 		

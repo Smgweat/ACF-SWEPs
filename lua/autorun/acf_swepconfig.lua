@@ -459,14 +459,14 @@ if CLIENT then
 	
 	
 	if not (Reticule and rets[Reticule]) then
-		print("ACF SWEPs: Couldn't find the " .. tostring(Reticule) .. " reticule!  Please choose a valid reticule in acf_swepconfig.lua.  Defaulting to Circle.")
+		--print("ACF SWEPs: Couldn't find the " .. tostring(Reticule) .. " reticule!  Please choose a valid reticule in acf_swepconfig.lua.  Defaulting to Circle.")
 		Reticule = "Circle"
 	end
 	
 end
 
 if not (AimStyle and aim[AimStyle]) then
-	print("ACF SWEPs: Couldn't find the " .. tostring(AimStyle) .. " aim-style!  Please choose a valid aim-style in acf_swepconfig.lua.  Defaulting to WOT.")
+	--print("ACF SWEPs: Couldn't find the " .. tostring(AimStyle) .. " aim-style!  Please choose a valid aim-style in acf_swepconfig.lua.  Defaulting to WOT.")
 	AimStyle = "WOT"
 end
 
@@ -488,7 +488,7 @@ function ACF_SquishyDamageOverride( Entity , Energy , FrAera , Angle , Inflictor
 			
 		local DamageBase = ( ( 1 + FrAera * 0.9 ) * (Energy.Penetration^0.8) )^0.5 * Damage_Offset * DAMAGE_SCALE
 
-		print(FrAera .. " - Front Area")
+		--print(FrAera .. " - Front Area")
 		--print(Energy.Kinetic .. " - Kinetic Energy")
 			
 		if ( Bone == 1 ) then		--This means we hit the head

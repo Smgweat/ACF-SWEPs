@@ -81,14 +81,14 @@ function SWEP:FireBullet()
 
 	local MuzzlePos = self.Owner:GetShootPos()
 	
-	print( self.Owner, self.Owner:GetShootPos(), self.Owner:GetPos() )
+	--print( self.Owner, self.Owner:GetShootPos(), self.Owner:GetPos() )
 
 	local MuzzleVec = self.Owner:GetAimVector()
 	local angs = self.Owner:EyeAngles()	
 	local MuzzlePos2 = MuzzlePos + angs:Forward() * self.AimOffset.x + angs:Right() * self.AimOffset.y
 	local MuzzleVecFinal = MuzzleVec --self:inaccuracy(MuzzleVec, self.Inaccuracy)
 	
-	print( MuzzleVecFinal )
+	--print( MuzzleVecFinal )
 	
 	self.BulletData["Pos"] = MuzzlePos
 	--print ( self.BulletData["MuzzleVel"] )
