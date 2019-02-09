@@ -169,7 +169,7 @@ function WOT.Think(self)
 		--	decay = decay * self.InaccuracyCrouchBonus
 		--end
 		
-		if self.WasCrouched != crouching then
+		if self.WasCrouched ~= crouching then
 			penalty = penalty --+ self.InaccuracyDuckPenalty
 		end
 		
@@ -385,9 +385,9 @@ if CLIENT then
 	
 		screenpos = Vector(math.floor(screenpos.x + 0.5), math.floor(screenpos.y + 0.5), 0)
 	
-		local alpha = (self:GetNetworkedBool("Zoomed") and ACF.SWEP.IronSights and self.IronSights and not self.HasScope) and (1 - self.zoomProgress) or self.zoomProgress
+		--local alpha = 1--(self:GetNetworkedBool("Zoomed") and ACF.SWEP.IronSights and self.IronSights and not self.HasScope) and (1 - self.zoomProgress) or self.zoomProgress
 	
-		local circlehue = Color(colourFade*255, colourFade*255, colourFade*255, 255*alpha)
+		local circlehue = Color(colourFade*255, colourFade*255, colourFade*255, 255)
 	
 		if self.ShotSpread and self.ShotSpread > 0 then
 			radius = ScrW() / 2 * (self.ShotSpread) / self.Owner:GetFOV()
@@ -395,7 +395,7 @@ if CLIENT then
 			
 			radius = ScrW() / 2 * (self.curVisInacc + self.ShotSpread) / self.Owner:GetFOV()
 		end
-		draw.Arc(screenpos.x, screenpos.y, radius, -2, (1-progress)*360, 360, 3, Color(0, 0, 0, alpha))
+		draw.Arc(screenpos.x, screenpos.y, radius, -2, (1-progress)*360, 360, 3, Color(0, 0, 0, 1))
 		draw.Arc(screenpos.x, screenpos.y, radius, -1, (1-progress)*360, 360, 3, circlehue)
 		
 	end
@@ -410,9 +410,9 @@ if CLIENT then
 	
 		screenpos = Vector(math.floor(screenpos.x + 0.5), math.floor(screenpos.y + 0.5), 0)
 		
-		local alpha = (self:GetNetworkedBool("Zoomed") and ACF.SWEP.IronSights and self.IronSights and not self.HasScope) and (1 - self.zoomProgress) or self.zoomProgress
+		--local alpha = 1 --(self:GetNetworkedBool("Zoomed") and ACF.SWEP.IronSights and self.IronSights and not self.HasScope) and (1 - self.zoomProgress) or self.zoomProgress
 	
-		local circlehue = Color(colourFade*255, colourFade*255, colourFade*255, 255*alpha)
+		local circlehue = Color(colourFade*255, colourFade*255, colourFade*255, 255)
 	
 		if self.ShotSpread and self.ShotSpread > 0 then
 			radius = ScrW() / 2 * (self.ShotSpread) / self.Owner:GetFOV()
@@ -544,7 +544,7 @@ function ACF_SquishyDamageOverride( Entity , Energy , FrAera , Angle , Inflictor
 	--BNK stuff
 	if (ISBNK) then
 		if(Entity.freq and Inflictor.freq) then
-			if (Entity != Inflictor) and (Entity.freq == Inflictor.freq) then
+			if (Entity ~= Inflictor) and (Entity.freq == Inflictor.freq) then
 				dmul = 0
 			end
 		end
@@ -552,7 +552,7 @@ function ACF_SquishyDamageOverride( Entity , Energy , FrAera , Angle , Inflictor
 	
 	--SITP stuff
 	local var = 1
-	if(!Entity.sitp_spacetype) then
+	if not Entity.sitp_spacetype then
 		Entity.sitp_spacetype = "space"
 	end
 	if(Entity.sitp_spacetype == "homeworld") then

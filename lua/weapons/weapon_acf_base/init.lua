@@ -8,19 +8,6 @@ include( "ai_translations.lua" )
 include( "sh_anim.lua" )
 include( "shared.lua" )
 
-function SWEP:UpdateFakeCrate(realcrate)
-
-	if not IsValid(self.FakeCrate) then
-		self.FakeCrate = ents.Create("acf_fakecrate")
-	end
-
-	self.FakeCrate:RegisterTo(self)
-	
-	self.BulletData["Crate"] = self.FakeCrate:EntIndex()
-	self:SetNWString( "Sound", self.Primary.Sound )
-end
-
-
 function SWEP:OnRemove()
 
 	if not IsValid(self.FakeCrate) then return end
@@ -80,7 +67,7 @@ function SWEP:Deploy()
 	self.RecoilShock = Angle( 0, 0, 0 )
 	--SetCurrentWeaponProficiency(WEAPON_PROFICIENCY_PERFECT)
 	if not self.Owner:IsNPC() then
-		self:DoAmmoStatDisplay()
+		--self:DoAmmoStatDisplay()
 		
 		if self.Zoomed then
 			self:SetZoom(false)
@@ -150,86 +137,3 @@ function SWEP.CallbackEndFlight(index, bullet, trace)
 		Effect:SetRadius((bullet.ProjMass * (bullet.Flight:Length() / 39.37)) / 10) -- ditched realism for more readability at range
 		util.Effect( "acf_sniperimpact", Effect, true, true)
 end
-
---[[---------------------------------------------------------
-	Name: Equip
-	Desc: A player or NPC has picked the weapon up
------------------------------------------------------------]]
-function SWEP:Equip(ply)
-
-	self.Owner = ply
-    
-	if self.Owner:IsNPC() then
-		self.Owner:SetCurrentWeaponProficiency( WEAPON_PROFICIENCY_PERFECT  )
-	end
-	
-	--self:SetHoldType( self.HoldType )
-	
-	self:SetNextPrimaryFire( CurTime() )
-    
-    --self:UpdateTracers()
-    
-    self.RecoilAxis = Vector(0,0,0)
-	
-	self.LastAmmoCountAppliedRecoil = nil
-    
-    self:SetOwnerZoomSpeed(false)
-    
-end
-
---[[---------------------------------------------------------
-	Name: OnDrop
-	Desc: Weapon was dropped
------------------------------------------------------------]]
-function SWEP:OnDrop()
-
-
-
-end
-
---[[---------------------------------------------------------
-	Name: ShouldDropOnDie
-	Desc: Should this weapon be dropped when its owner dies?
------------------------------------------------------------]]
-function SWEP:ShouldDropOnDie()
-
-	return true
-	
-end
-
---[[---------------------------------------------------------
-	Name: GetCapabilities
-	Desc: For NPCs, returns what they should try to do with it.
------------------------------------------------------------]]
-function SWEP:GetCapabilities()
-
-	return CAP_WEAPON_RANGE_ATTACK1
-
-end
-
---[[---------------------------------------------------------
-	Name: NPCShoot_Secondary
-	Desc: NPC tried to fire secondary attack
------------------------------------------------------------]]
-function SWEP:NPCShoot_Secondary( shootPos, shootDir )
-
-	self:SecondaryAttack()
-
-end
-
---[[---------------------------------------------------------
-	Name: NPCShoot_Secondary
-	Desc: NPC tried to fire primary attack
------------------------------------------------------------]]
-function SWEP:NPCShoot_Primary( shootPos, shootDir )
-
-	self:PrimaryAttack()
-
-end
-
--- These tell the NPC how to use the weapon
-AccessorFunc( SWEP, "fNPCMinBurst",		"NPCMinBurst" )
-AccessorFunc( SWEP, "fNPCMaxBurst",		"NPCMaxBurst" )
-AccessorFunc( SWEP, "fNPCFireRate",		"NPCFireRate" )
-AccessorFunc( SWEP, "fNPCMinRestTime",	"NPCMinRest" )
-AccessorFunc( SWEP, "fNPCMaxRestTime",	"NPCMaxRest" )

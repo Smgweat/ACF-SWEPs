@@ -40,7 +40,7 @@ if true then -- Shared variables
     SWEP.Purpose		= ""
     SWEP.Instructions	= ""
 
-    SWEP.Base 	  = "weapon_base"
+    --SWEP.Base 	  = "weapon_base"
     SWEP.Category = "ACF"
 
     SWEP.ViewModelFOV	= 54
@@ -156,6 +156,7 @@ function SWEP:InitBulletData()
 
     local FrontArea
 
+    print( "Initialized bulletdata" )
     self.BulletData = {}
 
     if Ammunition == "AP" then
@@ -187,53 +188,44 @@ function SWEP:InitBulletData()
 
 end
 
+function SWEP:UpdateFakeCrate(realcrate)
+
+  if SERVER then
+    
+    if not IsValid(self.FakeCrate) then
+      self.FakeCrate = ents.Create("acf_fakecrate")
+    end
+
+    self.FakeCrate:RegisterTo(self)
+    
+    self.BulletData["Crate"] = self.FakeCrate:EntIndex()
+    self:SetNWString( "Sound", self.Primary.Sound )
+    
+  end
+  
+end
+
+
 SWEP.LastAim = Vector()
 SWEP.LastThink = CurTime()
 SWEP.WasCrouched = false
 
 function SWEP:Initialize()
 
-    print( "Init_Swep" )
-    print( "Swep_Type", self.HoldType )
+  self:InitBulletData()
 
-    self:SetHoldType( self.HoldType )
-
-    if self.HoldType == "ar2" then
-        print( "Spawned weapon type AR2" )
-        self:SetWeaponHoldType( 'ar2' )
-    end
-
-    if self.HoldType == "smg" then
-        print( "Spawned weapon type SMG" )
-        self:SetWeaponHoldType( 'smg' )
-    end
-
-    if self.HoldType == "pistol" then
-        print( "Spawned weapon type Pistol" )
-        self:SetWeaponHoldType( 'pistol' )
-    end
-
-    if SERVER then
-        self:SetNPCMinBurst( 10 )
-        self:SetNPCMaxBurst( self.ClipSize )
-        self:SetNPCFireRate( self.Primary.Delay )
-    end
-
-    self:InitBulletData()
+	if ( SERVER ) then
+    
+		self:SetNPCMinBurst( 0 )
+		self:SetNPCMaxBurst( 0 )
+		self:SetNPCFireRate( self.Primary.Delay )
     self:UpdateFakeCrate()
+    
+	end
 
-    self.RecoilShock = Angle( 0, 0, 0 )
-
-    if SERVER and self.BulletData.IsShortForm and not self.IsGrenadeWeapon then
-        self.BulletData = ACF_ExpandBulletData(self.BulletData)
-    end
-
-    if SERVER then
-        self.BulletData.OnEndFlight = self.CallbackEndFlight
-    end
+	self:SetWeaponHoldType( self.HoldType )
 
 end
-
 
 function SWEP:Think()
 
@@ -244,7 +236,7 @@ function SWEP:Think()
     if CLIENT then
         self:ZoomThink()
 
-        self.DrawCrosshair	= GetConVar("acfsweps_showHLCrosshair"):GetBool()
+        self.DrawCrosshair= GetConVar("acfsweps_showHLCrosshair"):GetBool()
         self.ViewModelFOV	= GetConVar("acfsweps_viewmodelFOV"):GetInt()
 
     end
@@ -421,38 +413,30 @@ end
 
 
 function SWEP:PrimaryAttack()
-
+  
+    print( "Standard primary Attack was called " )
+  
     if self:CanPrimaryAttack() then
 
-        if self.Weapon:Clip1() > 0 or not self.Owner:IsNPC() then
+        if self.Weapon:Clip1() > 0 then
+          
             self.Weapon:TakePrimaryAmmo(1)
+            
         end
 
         self.Weapon:SendWeaponAnim( ACT_VM_PRIMARYATTACK )
         self.Owner:MuzzleFlash()
         self.Owner:SetAnimation( PLAYER_ATTACK1 )
 
-        if SERVER then
-
-            if self.Owner:IsNPC() then
-                self.Weapon:EmitSound( self.Primary.TPSound, 100, math.random(90,110) )
-            end
-
-            self:FireBullet()
-
-        end
-
+        if SERVER then self:FireBullet() end
+        
         self:VisRecoil()
-
         self:AddInaccuracy(self.InaccuracyPerShot)
-
         self.Weapon:SetNextPrimaryFire(CurTime() + self.Primary.Delay)
-
+        
     end
 
 end
-
-
 
 function SWEP:VisRecoil()
 
@@ -471,8 +455,6 @@ function SWEP:VisRecoil()
 
     end
 end
-
-
 
 
 function SWEP:CalculateVisRecoilScale()
@@ -589,7 +571,6 @@ function SWEP:FireAnimationEvent(pos,ang,event)
 
     if not self.NextFlash then self.NextFlash = curtime - 0.05 end
 
-    -- Disabled to determine error
     -- firstperson muzzleflash
     if event == 5001 then
 
@@ -655,3 +636,93 @@ function SWEP:UpdateTracers(overrideCol)
     self:UpdateFakeCrate()
 
 end
+
+
+--[[---------------------------------------------------------
+	Name: Equip
+	Desc: A player or NPC has picked the weapon up
+-----------------------------------------------------------]]
+function SWEP:Equip(ply)
+
+	self.Owner = ply
+    
+	--if self.Owner:IsNPC() then
+	--	self.Owner:SetCurrentWeaponProficiency( WEAPON_PROFICIENCY_PERFECT  )
+	--end
+	
+	--self:SetHoldType( self.HoldType )
+	
+	self:SetNextPrimaryFire( CurTime() )
+    
+    --self:UpdateTracers()
+    
+    self.RecoilAxis = Vector(0,0,0)
+	
+	self.LastAmmoCountAppliedRecoil = nil
+    
+    self:SetOwnerZoomSpeed(false)
+    
+end
+
+--[[---------------------------------------------------------
+	Name: OnDrop
+	Desc: Weapon was dropped
+-----------------------------------------------------------]]
+function SWEP:OnDrop()
+
+
+
+end
+
+--[[---------------------------------------------------------
+	Name: ShouldDropOnDie
+	Desc: Should this weapon be dropped when its owner dies?
+-----------------------------------------------------------]]
+function SWEP:ShouldDropOnDie()
+
+	return true
+	
+end
+
+--[[---------------------------------------------------------
+	Name: GetCapabilities
+	Desc: For NPCs, returns what they should try to do with it.
+-----------------------------------------------------------]]
+function SWEP:GetCapabilities()
+	return ( CAP_WEAPON_RANGE_ATTACK1 || CAP_INNATE_RANGE_ATTACK1 || CAP_WEAPON_RANGE_ATTACK2 || CAP_INNATE_RANGE_ATTACK2 )
+end
+
+--[[---------------------------------------------------------
+	Name: NPCShoot_Secondary
+	Desc: NPC tried to fire secondary attack
+-----------------------------------------------------------]]
+function SWEP:NPCShoot_Secondary( shootPos, shootDir )
+
+	self:SecondaryAttack()
+
+end
+
+--[[---------------------------------------------------------
+	Name: NPCShoot_Primary
+	Desc: NPC tried to fire primary attack
+-----------------------------------------------------------]]
+function SWEP:NPCShoot_Primary( shootPos, shootDir )
+    
+  if self:CanPrimaryAttack() then
+    self.Owner:MuzzleFlash()
+    self.Owner:SetAnimation( PLAYER_ATTACK1 )
+    self.Weapon:SetNextPrimaryFire(CurTime() + self.Primary.Delay)
+    self.Weapon:EmitSound( self.Primary.TPSound, 100, math.random(90,110) )
+    
+    if SERVER then self:FireBullet() end
+    
+  end
+
+end
+
+-- These tell the NPC how to use the weapon
+AccessorFunc( SWEP, "fNPCMinBurst",		"NPCMinBurst" )
+AccessorFunc( SWEP, "fNPCMaxBurst",		"NPCMaxBurst" )
+AccessorFunc( SWEP, "fNPCFireRate",		"NPCFireRate" )
+AccessorFunc( SWEP, "fNPCMinRestTime",	"NPCMinRest" )
+AccessorFunc( SWEP, "fNPCMaxRestTime",	"NPCMaxRest" )

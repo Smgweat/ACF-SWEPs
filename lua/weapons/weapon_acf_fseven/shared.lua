@@ -40,16 +40,16 @@ if true then -- Shared variables
 		volume = VOL_NORM,
 		level = 500,
 		pitch = { 95, 110 },
-		sound = "^weapons/acf_swep/acf_fseven.wav"
+		sound = ")weapons/fiveseven/fiveseven-1.wav"
 	} )
 	
-	SWEP.Primary.Sound 	   	 = "ACF_SWEP_fseven"
-	SWEP.Primary.TPSound   	 = "ACF_SWEP_fseven"
+	SWEP.Primary.Sound = "ACF_SWEP_fseven"
+	SWEP.Primary.TPSound = "ACF_SWEP_fseven"
 
-	SWEP.Primary.Delay		 = 0.1
-	SWEP.Primary.ClipSize 	 = 20
+	SWEP.Primary.Delay = 0.1
+	SWEP.Primary.ClipSize = 20
 	SWEP.Primary.DefaultClip = 40
-	SWEP.Primary.Automatic 	 = false
+	SWEP.Primary.Automatic = false
 	
 	SWEP.ReloadTime = 1.6
 	
@@ -59,25 +59,25 @@ if true then -- Shared variables
 	
 	-- Gun statistics
 	SWEP.Handling = {}
-	SWEP.Handling.Mass	   = 610 	-- Weight in grams
-	SWEP.Handling.Barrel   = 122 	-- Barrel length in milimeters
-	SWEP.Handling.Balance  = 1 		-- Recoil multiplier for this weapon
+	SWEP.Handling.Mass = 610 	-- Weight in grams
+	SWEP.Handling.Barrel = 122 	-- Barrel length in milimeters
+	SWEP.Handling.Balance = 1 		-- Recoil multiplier for this weapon
 	
 	-- Sight Options
-	SWEP.HasZoom  = false
+	SWEP.HasZoom = false
 	SWEP.HasScope = false
 	SWEP.IronSights = true
 	SWEP.IronSightsPos = Vector(0, 6.02, 2.87)
 	SWEP.ZoomPos = Vector(2,-2,2)
 	SWEP.IronSightsAng = Angle(0.4, -0.16, 0)
-	SWEP.ZoomFOV  = 50
+	SWEP.ZoomFOV = 50
 	
 	-- Ammunition ( FN 5.7×28mm )
 	SWEP.Ammunition	= "AP" 		-- Ammunition type
-	SWEP.GunType 	= "Rifle" 	-- For bullet length approximation
-	SWEP.Caliber 	= 5.7 		-- Diameter in milimeters
-	SWEP.Length 	= 28 		-- Case length in milimeters, The bullet length is estimated
-	SWEP.MuzzleVel 	= 716 		-- Speed of the fired bullet in meters per second
+	SWEP.GunType = "Rifle" 	-- For bullet length approximation
+	SWEP.Caliber = 5.7 		-- Diameter in milimeters
+	SWEP.Length = 28 		-- Case length in milimeters, The bullet length is estimated
+	SWEP.MuzzleVel = 716 		-- Speed of the fired bullet in meters per second
 	SWEP.BulletMass = 2 		-- Weight in Grams ( Not grains! )
 	
 end

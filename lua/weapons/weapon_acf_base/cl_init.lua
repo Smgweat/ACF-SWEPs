@@ -3,45 +3,10 @@ include( "ai_translations.lua" )
 include( "sh_anim.lua" )
 include( "shared.lua" )
 
-function SWEP:Initialize()
-
-	if not IsValid(self.Owner) then return end
-	--self:SetHoldType( self.HoldType )
-	if self.Owner:IsNPC() then
-		self.defaultFOV = 0
-	else
-		self.defaultFOV = self.Owner:GetFOV()
-	end
-  
-	self.lastaccuracy = self.MaxInaccuracy
-	self.wasReloading = false
-	self.reloadBegin = 0
-	
-	self.lastHUDDraw = CurTime()
-	
-	self.timeDiff = 0
-	self.lastServRecv = CurTime() - 0.1
-	self.lastServInacc = 1--self.MaxInaccuracy
-	self.curServInacc = 1--self.MaxInaccuracy
-	self.curVisInacc = 1--self.MaxInaccuracy
-	self.smoothFactor = 0
-	
-	self.fromPos = Vector(0,0,0)
-	self.toPos = Vector(0,0,0)
-	
-	self.fromAng = Angle(0,0,0)
-	self.toAng = Angle(0,0,0)
-	
-	self.zoomProgress = 1
-	
-	self:InitBulletData()
-    
-end
-
 function SWEP:ZoomThink()
 	local zoomed = self:GetNetworkedBool("Zoomed")
 	--Msg(zoomed)
-	if zoomed != self.Zoomed then
+	if zoomed ~= self.Zoomed then
 		--print(zoomed, "has changed!!11")
 		self.Zoomed = zoomed
 		
@@ -288,7 +253,7 @@ hook.Add( "PreRender", "ACFWep_PreRender", function()
 			
 				local timeDiff = curTime - (self.lastPreRender or curTime)
 				local decayTime = axisLength / recoilDamping
-				local timeDiff = math.min(timeDiff, decayTime)
+				timeDiff = math.min(timeDiff, decayTime)
 			
 				local accumulatedRecoil = axisLength * timeDiff - (recoilDamping * timeDiff * timeDiff) / 2
 				local newAxisLength = -recoilDamping * timeDiff + axisLength
