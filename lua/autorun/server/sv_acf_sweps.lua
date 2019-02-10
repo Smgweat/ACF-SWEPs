@@ -81,7 +81,7 @@ function ACF_SWEP_PlayerTickSimulate(ply, move)
 	for k, bullet in pairs(plyBullets) do
 		--print("sim bullet ", k)
 		if bullet and bullet.Index then
-			print ( bullet.Index )
+			--print ( bullet.Index )
 			CalcFlight( bullet.Index, bullet )
 		end
 	end

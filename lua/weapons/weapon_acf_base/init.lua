@@ -23,7 +23,7 @@ local nopen = {HE = true, SM = true, FLR = true}
 function SWEP:DoAmmoStatDisplay()
     
     local bdata = self.BulletData
-	PrintTable( bdata ) 
+	--PrintTable( bdata ) 
 	if bdata.IsShortForm then
 		bdata = ACF_ExpandBulletData(table.Copy(bdata))
 	end
@@ -63,7 +63,7 @@ end
 
 
 function SWEP:Deploy()
-	print (self.Owner)
+	--print (self.Owner)
 	self.RecoilShock = Angle( 0, 0, 0 )
 	--SetCurrentWeaponProficiency(WEAPON_PROFICIENCY_PERFECT)
 	if not self.Owner:IsNPC() then
@@ -95,9 +95,9 @@ function SWEP:FireBullet()
 	--print ( MuzzleVec )
 	--print ( MuzzleVecFinal )
 	self.BulletData["Flight"] = ( self.BulletData["MuzzleVel"] * MuzzleVecFinal * 52.4590163934 ) + self.Owner:GetVelocity()
-	print ( self.BulletData["Flight"] )
+	--print ( self.BulletData["Flight"] )
 	self.BulletData["Owner"] = self.Owner
-	print ( self.BulletData["Owner"] )
+	--print ( self.BulletData["Owner"] )
 	self.BulletData["Gun"] = self
 
 	if self.BeforeFire then
