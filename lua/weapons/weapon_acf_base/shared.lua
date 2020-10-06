@@ -444,7 +444,7 @@ function SWEP:VisRecoil()
 
     if ( (game.SinglePlayer() and SERVER) or ( not game.SinglePlayer() and CLIENT and IsFirstTimePredicted() ) ) then
 
-        local punchScale = ( ( self.BulletMass * 0.1 * self.MuzzleVel ) / ( self.Handling.Mass ) )
+        local punchScale = ( ( self.BulletMass * 0.1 * self.MuzzleVel ) / ( self.Handling.Mass / self.Handling.Balance ) )
 
         local rnda = ( -punchScale * math.random() ) * 10
         local rndb = ( math.random() * punchScale - punchScale / 2 ) * 10

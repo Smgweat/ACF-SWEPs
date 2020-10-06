@@ -1,4 +1,4 @@
-/*
+--[[
        _   ___ ___   ___                    
       /_\ / __| __| / __|_ __ _____ _ __ ___
      / _ \ (__| _|  \__ \ V  V / -_) '_ (_-<
@@ -6,10 +6,7 @@
                     By Bubbus!     |_|      
 
 	Conversion of XCF sweps to standalone ACF-compatible format.
-	
-//*/
-
-
+]]--
 
 AddCSLuaFile("autorun/client/drawarc.lua")
 
