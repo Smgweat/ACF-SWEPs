@@ -72,7 +72,10 @@ function SWEP:Deploy()
 		if self.Zoomed then
 			self:SetZoom(false)
 		end
-    end
+	end
+    
+    if ( not self.Owner:IsNPC() and SERVER ) then self.Owner:SendLua("GAMEMODE:AddNotify( \"" .. self.Caliber .. "mm " .. self.Ammunition .. "\", NOTIFY_GENERIC, 5)") print("conf") end
+
 	--PrintTable(getmetatable(self))
 end
 
@@ -83,7 +86,9 @@ function SWEP:FireBullet()
 	
 	--print( self.Owner, self.Owner:GetShootPos(), self.Owner:GetPos() )
 
-	local MuzzleVec = self.Owner:GetAimVector()
+	local MuzzleVec = Vector( self.Handling.Barrel, self.Caliber * ( math.random() - 0.5 ), self.Caliber * ( math.random() - 0.5 ) ):GetNormalized()
+	-- self.Owner:GetAimVector()
+	MuzzleVec:Rotate( self.Owner:GetAimVector():Angle() )
 	local angs = self.Owner:EyeAngles()	
 	local MuzzlePos2 = MuzzlePos + angs:Forward() * self.AimOffset.x + angs:Right() * self.AimOffset.y
 	local MuzzleVecFinal = MuzzleVec --self:inaccuracy(MuzzleVec, self.Inaccuracy)

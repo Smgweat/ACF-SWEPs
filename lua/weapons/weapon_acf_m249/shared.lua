@@ -6,7 +6,7 @@ if CLIENT then -- Client only variables
     SWEP.Slot		= 3						-- Slot in the weapon selection menu
     SWEP.SlotPos	= 10					-- Position in the slot
 
-    killicon.AddFont( "weapon_acf_m249", "CSSD_Killcon", "w", Color( 255, 80, 0, 255 ) )
+    killicon.AddFont( "weapon_acf_m249", "CSSD_Killcon", "z", Color( 255, 80, 0, 255 ) )
 
     SWEP.WepSelectIcon = surface.GetTextureID( "vgui/gfx/vgui/fav_weap/m249" )
 
@@ -46,9 +46,9 @@ if true then -- Shared variables
     SWEP.Primary.Sound = "ACF_SWEP_m249"
     SWEP.Primary.TPSound = "ACF_SWEP_m249"
 
-    SWEP.Primary.Delay = 0.1
-    SWEP.Primary.ClipSize = 100
-    SWEP.Primary.DefaultClip = 200
+    SWEP.Primary.Delay = 60 / 700
+    SWEP.Primary.ClipSize = 200
+    SWEP.Primary.DefaultClip = 400
     SWEP.Primary.Automatic = true
 
     SWEP.ReloadTime = 4.5
@@ -59,8 +59,8 @@ if true then -- Shared variables
 
     -- Gun statistics
     SWEP.Handling = {}
-    SWEP.Handling.Mass	   = 10000 	-- Weight in grams
-    SWEP.Handling.Barrel   = 465 	-- Barrel length in milimeters
+    SWEP.Handling.Mass	   = 9100 	-- Weight in grams
+    SWEP.Handling.Barrel   = 893 	-- Barrel length in milimeters
     SWEP.Handling.Balance  = 10 	-- Recoil multiplier for this weapon
 
     -- Sight Options
@@ -77,7 +77,7 @@ if true then -- Shared variables
     SWEP.GunType 	= "Rifle" 	-- For bullet length approximation
     SWEP.Caliber 	= 5.56 		-- Diameter in milimeters
     SWEP.Length 	= 45 		-- Case length in milimeters, The bullet length is estimated
-    SWEP.MuzzleVel 	= 910 		-- Speed of the fired bullet in meters per second
+    SWEP.MuzzleVel 	= 915 		-- Speed of the fired bullet in meters per second
     SWEP.BulletMass = 4 		-- Weight in Grams ( Not grains! )
 
 end

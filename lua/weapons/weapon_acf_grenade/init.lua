@@ -51,7 +51,7 @@ function SWEP.grenadeTraceHit(bomb, trace)
 		--debugoverlay.Cross( trace.HitPos, 10, 10, Color(0, 255, 0), true )
 		
 		bomb:SetPos(setpos)
-		bomb.grenadeExplode(bomb)
+		--bomb.grenadeExplode(bomb)
 	end
 end
 
@@ -84,7 +84,7 @@ function SWEP:FireBullet()
 	bomb:SetModelEasy(self.ThrowModel)
 	bomb:SetBulletData(self.BulletData)
 	local expfunc = self.grenadeExplode
-	bomb.grenadeExplode = expfunc
+	--bomb.grenadeExplode = expfunc
 	timer.Simple(5, function() expfunc(bomb) end)
 	
 	
@@ -100,7 +100,7 @@ function SWEP:FireBullet()
 		local angvel = self.Owner:LocalToWorld(Vector(400 + math.random()*300, 1000 + math.random()*1000, 40 + math.random()*30)) - self.Owner:GetPos()
 		phys:AddAngleVelocity( angvel * throwmod)
 		bomb.PhysicsCollide = self.grenadeDonk
-		construct.SetPhysProp( nil, bomb, 0, phys, { GravityToggle = true, Material = "rubber" } ) 
+		construct.SetPhysProp( nil, bomb, 0, phys, { GravityToggle = true--[[, Material = "rubber"]] } ) 
 	end
 	
 	

@@ -11,6 +11,8 @@ if (CLIENT) then
 	SWEP.DrawCrosshair		= false
 	SWEP.Purpose			= "Make groups of dudes disappear."
 	SWEP.Instructions       = "Reload at Bomb Ammo-boxes!"
+	
+	SWEP.WepSelectIcon = surface.GetTextureID( "vgui/gfx/vgui/hegrenade" )
 
 end
 

@@ -219,7 +219,7 @@ function SWEP:Initialize()
 		self:SetNPCMinBurst( 0 )
 		self:SetNPCMaxBurst( 0 )
 		self:SetNPCFireRate( self.Primary.Delay )
-    self:UpdateFakeCrate()
+        self:UpdateFakeCrate()
     
 	end
 
@@ -234,10 +234,11 @@ function SWEP:Think()
     local isReloading = self.Weapon:GetNetworkedBool( "reloading", false )
 
     if CLIENT then
+
         self:ZoomThink()
 
-        self.DrawCrosshair= GetConVar("acfsweps_showHLCrosshair"):GetBool()
-        self.ViewModelFOV	= GetConVar("acfsweps_viewmodelFOV"):GetInt()
+        self.DrawCrosshair = GetConVar("acfsweps_showHLCrosshair"):GetBool()
+        self.ViewModelFOV = GetConVar("acfsweps_viewmodelFOV"):GetInt()
 
     end
 
@@ -273,10 +274,17 @@ function SWEP:Think()
 
         -- Smooth recoil function.
         if not self.Owner:IsNPC() and math.abs(self.RecoilShock.p) + math.abs(self.RecoilShock.y) > 0.1 then
+
             self.Owner:SetEyeAngles( self.Owner:EyeAngles() + self.RecoilShock * 0.2 )
-            self.RecoilShock = self.RecoilShock * 0.8
+
+            local recoilShockNormalized = self.RecoilShock / math.sqrt( self.RecoilShock.p * self.RecoilShock.p + self.RecoilShock.y * self.RecoilShock.y )
+            local fadeOff = math.Clamp( ( math.abs( self.RecoilShock.p ) + math.abs( self.RecoilShock.y ) + math.abs( self.RecoilShock.r ) ), 0, 1 )
+            self.RecoilShock = self.RecoilShock*0.96 - recoilShockNormalized / ( 1 + self.Handling.Barrel * self.Handling.Barrel * 0.0002 ) * fadeOff
+        
         else
+
             self.RecoilShock = Angle( 0, 0, 0 )
+
         end
 
     end
@@ -297,6 +305,7 @@ function SWEP:SetZoom(zoom)
     if zoom == nil then
         self.Zoomed = not self.Zoomed
     else
+        if ( not self.Owner:IsNPC() and SERVER ) then self.Owner:SendLua( "EmitSound( \"weapons/sniper/sniper_zoomin.wav\", EyePos(), -2 )" ) end
         self.Zoomed = zoom
     end
 
@@ -324,9 +333,6 @@ function SWEP:SetZoom(zoom)
     end
 
 end
-
-
-
 
 function SWEP:SetOwnerZoomSpeed(setSpeed)
 
@@ -368,30 +374,20 @@ end
 
 
 function SWEP:CanPrimaryAttack()
+
+    if self.Owner:IsNPC() then return true end
+    if self.Owner:InVehicle() then return false end
+    if self.Owner:GetMoveType() ~= MOVETYPE_WALK then return false end
+    if CurTime() < self.Weapon:GetNextPrimaryFire() then return false end
     if self.Weapon:GetNetworkedBool( "reloading", false ) then return false end
 
-    if not self.Owner:IsNPC() and not (ACF.SWEP.NoclipShooting or self.Owner:GetMoveType() == MOVETYPE_WALK or self.Owner:InVehicle()) then return false end
-
-    if CurTime() < self.Weapon:GetNextPrimaryFire() then return false end
-
     if self.Primary.ClipSize < 0 then
-        local ammoct = self.Owner:GetAmmoCount( self.Primary.Ammo )
-        if ammoct <= 0 then return false end
+        if self.Owner:GetAmmoCount( self.Primary.Ammo ) <= 0 then return false end
     else
-        local clip = self.Weapon:Clip1()
-        if clip <= 0 then
-            if self.Owner:IsNPC() then
-
-                return true
-
-            else
-
-                self.Weapon:EmitSound( "acf_sweps_misfire" )
-                self:SetNextPrimaryFire( CurTime() + 0.5 )
-
-                return false
-
-            end
+        if self.Weapon:Clip1() <= 0 then
+            self.Weapon:EmitSound( "acf_sweps_misfire" )
+            self:SetNextPrimaryFire( CurTime() + 0.5 )
+            return false
         end
     end
 
@@ -400,17 +396,13 @@ function SWEP:CanPrimaryAttack()
 end
 
 
-
 function SWEP:SetInaccuracy(add)
     ACF.SWEP.SetInaccuracy(self, add)
 end
 
-
 function SWEP:AddInaccuracy(add)
     ACF.SWEP.AddInaccuracy(self, add)
 end
-
-
 
 function SWEP:PrimaryAttack()
   
@@ -428,10 +420,14 @@ function SWEP:PrimaryAttack()
         self.Owner:MuzzleFlash()
         self.Owner:SetAnimation( PLAYER_ATTACK1 )
 
+        if ( CLIENT and IsFirstTimePredicted() ) or ( game.SinglePlayer() and SERVER ) then
+            self.Weapon:EmitSound( self.Primary.TPSound, math.random(90,110), math.random(90,110) )
+        end
+
         if SERVER then self:FireBullet() end
         
         self:VisRecoil()
-        self:AddInaccuracy(self.InaccuracyPerShot)
+        self:AddInaccuracy( self.InaccuracyPerShot )
         self.Weapon:SetNextPrimaryFire(CurTime() + self.Primary.Delay)
         
     end
@@ -444,7 +440,9 @@ function SWEP:VisRecoil()
 
     if ( (game.SinglePlayer() and SERVER) or ( not game.SinglePlayer() and CLIENT and IsFirstTimePredicted() ) ) then
 
-        local punchScale = ( ( self.BulletMass * 0.1 * self.MuzzleVel ) / ( self.Handling.Mass / self.Handling.Balance ) )
+        local punchScale = ( ( self.BulletMass * 0.1 * self.MuzzleVel ) / ( self.Handling.Mass ) )
+
+        if self.Owner:Crouching() then punchScale = punchScale * 0.5 end
 
         local rnda = ( -punchScale * math.random() ) * 10
         local rndb = ( math.random() * punchScale - punchScale / 2 ) * 10
@@ -649,7 +647,7 @@ function SWEP:Equip(ply)
 	--if self.Owner:IsNPC() then
 	--	self.Owner:SetCurrentWeaponProficiency( WEAPON_PROFICIENCY_PERFECT  )
 	--end
-	
+
 	--self:SetHoldType( self.HoldType )
 	
 	self:SetNextPrimaryFire( CurTime() )
@@ -709,10 +707,14 @@ end
 function SWEP:NPCShoot_Primary( shootPos, shootDir )
     
   if self:CanPrimaryAttack() then
+    
     self.Owner:MuzzleFlash()
     self.Owner:SetAnimation( PLAYER_ATTACK1 )
     self.Weapon:SetNextPrimaryFire(CurTime() + self.Primary.Delay)
-    self.Weapon:EmitSound( self.Primary.TPSound, 100, math.random(90,110) )
+
+    if IsFirstTimePredicted() then
+        self.Weapon:EmitSound( self.Primary.TPSound, 100, math.random(90,110) )
+    end
     
     if SERVER then self:FireBullet() end
     

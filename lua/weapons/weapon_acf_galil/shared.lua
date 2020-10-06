@@ -3,7 +3,7 @@ AddCSLuaFile( "shared.lua" )
 
 if CLIENT then -- Client only variables
 
-    SWEP.Slot = 3						-- Slot in the weapon selection menu
+    SWEP.Slot = 2						-- Slot in the weapon selection menu
     SWEP.SlotPos = 10					-- Position in the slot
 
     killicon.AddFont( "weapon_acf_galil", "CSSD_Killcon", "v", Color( 255, 80, 0, 255 ) )

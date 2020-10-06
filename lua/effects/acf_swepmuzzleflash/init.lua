@@ -47,11 +47,11 @@
 				Ang = Gun.Owner:EyeAngles()
 			}
 			
-			Gun:EmitSound( GunSound, math.Clamp(SoundPressure,75,255), math.Clamp(100,15,255), 1, CHAN_WEAPON )
+			--Gun:EmitSound( GunSound, math.Clamp(SoundPressure,75,255), math.Clamp(100,15,255), 1, CHAN_WEAPON )
 			--sound.Play( GunSound, Muzzle.Pos , math.Clamp(SoundPressure,75,255), math.Clamp(100,15,255))
 			if not ((Class == "MG") or (Class == "RAC")) then
 				--sound.Play( GunSound, Muzzle.Pos , math.Clamp(SoundPressure,75,255), math.Clamp(100,15,255))
-				Gun:EmitSound( GunSound, math.Clamp(SoundPressure,75,255), math.Clamp(100,15,255), 1, CHAN_WEAPON )
+				--Gun:EmitSound( GunSound, math.Clamp(SoundPressure,75,255), math.Clamp(100,15,255), 1, CHAN_WEAPON )
 			end
 			
 			local aimoffset = Gun.AimOffset or Vector()
