@@ -1,6 +1,5 @@
 <p align="middle">
 	<img src="https://img.shields.io/github/last-commit/smgweat/acf-sweps.svg?style=flat">
-	<img src="https://img.shields.io/github/downloads/smgweat/acf-sweps/total.svg?label=Downloads&style=flat"> 
 	<img src="https://img.shields.io/github/repo-size/smgweat/acf-sweps.svg?style=flat"> 
 	<img src="https://img.shields.io/github/issues-raw/smgweat/acf-sweps.svg?style=flat">
 	<img src="https://img.shields.io/github/license/smgweat/acf-sweps.svg?style=flat">
