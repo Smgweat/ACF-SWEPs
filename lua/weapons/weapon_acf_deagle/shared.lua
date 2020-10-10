@@ -1,5 +1,5 @@
 
-resource.AddFile( "vgui/entities/weapon_acf_deagle.vmt" )
+resource.AddFile( "materials/vgui/entities/weapon_acf_deagle.vmt" )
 AddCSLuaFile( "shared.lua" )
 
 if CLIENT then -- Client only variables

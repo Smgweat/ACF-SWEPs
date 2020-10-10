@@ -57,7 +57,7 @@ function ACF_CreateBulletSWEP( BulletData, Swep, LagComp )
 		end
     end
 	
-	PrintTable( InstanceBulletData )
+	--PrintTable( InstanceBulletData )
 
 	ACF_CustomBulletLaunch(InstanceBulletData)
 	

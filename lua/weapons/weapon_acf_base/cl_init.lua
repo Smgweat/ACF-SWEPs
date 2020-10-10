@@ -95,18 +95,18 @@ function SWEP:DrawScope()
 	local basewide2 = basewide * 2
 	local centersep = scrh * 0.02
 
-	render.UpdateRefractTexture()
+	--render.UpdateRefractTexture()
 	surface.SetDrawColor( 0, 0, 0, 255 )
 
-	surface.SetMaterial( Material( "gmod/scope-refract" ) )
-	surface.DrawTexturedRect( rectsides, 0, ( scrw - rectsides * 2 ), scrh )
+	--surface.SetMaterial( Material( "gmod/scope-refract" ) )
+	--surface.DrawTexturedRect( rectsides, 0, ( scrw - rectsides * 2 ), scrh )
 
 	surface.SetMaterial( Material( "weapons/scopes/rg_parascope" ) )
 	surface.DrawTexturedRect( hscrw - ( scrw - rectsides * 2 ) / 4, scrh / 4, ( scrw - rectsides * 2 ) / 2, scrh / 2 )
 
 	surface.SetMaterial( Material( "gmod/scope" ) )
 	surface.DrawTexturedRect( rectsides, 0, scrw - rectsides * 2, scrh )
-	
+	--[[
 	surface.SetFont( "BudgetLabel" )
 	surface.SetTextColor( 255, 255, 255 )
 	surface.SetTextPos( hscrw * 0.90, hscrh * 1.08 ) 
@@ -115,7 +115,7 @@ function SWEP:DrawScope()
 	else
 		surface.DrawText( math.Round( ( trace.HitPos - trace.StartPos ):Length() / 52.49 ) .. "M" )
 	end
-
+	]]
 	surface.DrawRect(                    0, 0, rectsides + 2, scrh )
 	surface.DrawRect( scrw - rectsides - 2, 0, rectsides + 4, scrh )
 	
