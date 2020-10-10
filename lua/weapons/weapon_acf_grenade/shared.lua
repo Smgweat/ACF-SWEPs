@@ -1,4 +1,6 @@
-	AddCSLuaFile( "shared.lua" )
+
+resource.AddFile( "materials/vgui/entities/weapon_acf_grenade.vmt" )
+AddCSLuaFile( "shared.lua" )
 	SWEP.HoldType			= "grenade"
 
 if (CLIENT) then
