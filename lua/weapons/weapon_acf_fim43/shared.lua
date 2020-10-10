@@ -1,5 +1,5 @@
 
-AddCSLuaFile( "vgui/entities/weapon_acf_fim43.vmt" )
+resource.AddFile( "vgui/entities/weapon_acf_fim43.vmt" )
 AddCSLuaFile( "shared.lua" )
 	
 SWEP.HoldType = "rpg"

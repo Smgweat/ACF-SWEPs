@@ -1,5 +1,5 @@
 
-AddCSLuaFile( "vgui/entities/weapon_acf_iws.vmt" )
+resource.AddFile( "vgui/entities/weapon_acf_iws.vmt" )
 AddCSLuaFile( "shared.lua" )
 
 if CLIENT then -- Client only variables
