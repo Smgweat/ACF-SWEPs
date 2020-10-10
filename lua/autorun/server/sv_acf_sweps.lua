@@ -1,12 +1,3 @@
---[[
-       _   ___ ___   ___                    
-      /_\ / __| __| / __|_ __ _____ _ __ ___
-     / _ \ (__| _|  \__ \ V  V / -_) '_ (_-<
-    /_/ \_\___|_|   |___/\_/\_/\___| .__/__/
-                    By Bubbus!     |_|      
-
-	Conversion of XCF sweps to standalone ACF-compatible format.
-]]--
 
 AddCSLuaFile("autorun/client/drawarc.lua")
 
@@ -17,54 +8,62 @@ ACF.SWEP = ACF.SWEP or {}
 ACF.SWEP.PlyBullets = ACF.SWEP.PlyBullets or {}
 local bullets = ACF.SWEP.PlyBullets
 
+function shallowcopy(orig)
+    local orig_type = type(orig)
+    local copy
+    if orig_type == 'table' then
+        copy = {}
+        for orig_key, orig_value in pairs(orig) do
+            copy[orig_key] = orig_value
+        end
+    else -- number, string, boolean, etc
+        copy = orig
+    end
+    return copy
+end
 function ACF_CreateBulletSWEP( BulletData, Swep, LagComp )
 
 	if not IsValid(Swep) then error("Tried to create swep round with no swep or owner!") return end
-	
-	--local owner = Swep:IsPlayer() and Swep or Swep.Owner or BulletData.Owner or error("Tried to create swep round with unowned swep!")
-	
+
 	local owner = BulletData["Owner"]
 	
-	--print(owner)
-	BulletData = table.Copy(BulletData)
-	
+	local InstanceBulletData = shallowcopy(BulletData)
+	InstanceBulletData.Filter = {}
+
 	if LagComp and not owner:IsNPC() then
-		BulletData.LastThink = SysTime()
-		
-		BulletData.Owner = owner
-		BulletData.HandlesOwnIteration = true
-		BulletData.OnRemoved = ACF_SWEP_OnRemoved
+		InstanceBulletData.LastThink = SysTime()
+		InstanceBulletData.HandlesOwnIteration = true
+		InstanceBulletData.OnRemoved = ACF_SWEP_OnRemoved
 	end
 	
-	BulletData.TraceBackComp = 0
+	InstanceBulletData.TraceBackComp = 0
 	--BulletData.TraceBackComp = owner:GetVelocity():Dot(BulletData.Flight:GetNormalized())
-	BulletData.Gun = Swep
+	InstanceBulletData.Gun = Swep
 	
-	BulletData.Filter = BulletData.Filter or {}
+	InstanceBulletData.Filter = {}
     
     if IsValid(Swep) then
-        BulletData.Filter[#BulletData.Filter + 1] = Swep
+        InstanceBulletData.Filter[#InstanceBulletData.Filter + 1] = Swep
     end
     
 	if IsValid(owner) then
-        BulletData.Filter[#BulletData.Filter + 1] = owner
+        InstanceBulletData.Filter[#InstanceBulletData.Filter + 1] = owner
         
 		if not owner:IsNPC() then
 			local vehicle = owner:GetVehicle()
 			if IsValid(vehicle) then
-				BulletData.Filter[#BulletData.Filter + 1] = vehicle
+				InstanceBulletData.Filter[#InstanceBulletData.Filter + 1] = vehicle
 			end
 		end
     end
 	
-	ACF_CustomBulletLaunch(BulletData)
+	PrintTable( InstanceBulletData )
+
+	ACF_CustomBulletLaunch(InstanceBulletData)
 	
-	return BulletData
+	return InstanceBulletData
 	
 end
-
-
-
 
 function ACF_SWEP_PlayerTickSimulate(ply, move)
 	

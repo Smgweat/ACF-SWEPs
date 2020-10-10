@@ -1,4 +1,5 @@
 
+AddCSLuaFile( "vgui/entities/weapon_acf_deagle.vmt" )
 AddCSLuaFile( "shared.lua" )
 
 if CLIENT then -- Client only variables
@@ -24,7 +25,7 @@ if true then -- Shared variables
 
     SWEP.Base = "weapon_acf_base"
 
-    SWEP.HoldType = "pistol"
+    SWEP.HoldType = "revolver"
     SWEP.ViewModel = "models/weapons/cstrike/c_pist_deagle.mdl"
     SWEP.WorldModel = "models/weapons/w_pist_deagle.mdl"
 

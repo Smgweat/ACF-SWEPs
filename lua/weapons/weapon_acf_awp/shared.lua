@@ -1,4 +1,5 @@
 
+AddCSLuaFile( "vgui/entities/weapon_acf_awp.vmt" )
 AddCSLuaFile( "shared.lua" )
 
 if CLIENT then -- Client only variables
@@ -40,7 +41,7 @@ if true then -- Shared variables
         volume = VOL_NORM,
         level = 500,
         pitch = { 95, 110 },
-        sound = ")weapons/awp/awp1.wav" -- sound = "^weapons/acf_swep/acf_deag.wav"
+        sound = ")weapons/awp/awp1.wav"
     } )
 
     SWEP.Primary.Sound 	   	 = "ACF_SWEP_awp"
@@ -70,7 +71,7 @@ if true then -- Shared variables
     SWEP.IronSightsPos = Vector(0, 6.02, 2.87)
     SWEP.ZoomPos = Vector(2,-2,2)
     SWEP.IronSightsAng = Angle(0.4, -0.16, 0)
-    SWEP.ZoomFOV = 30
+    SWEP.ZoomFOV = 20
 
     -- Ammunition ( 7.62x51 NATO )
     SWEP.Ammunition	= "AP" 		-- Ammunition type

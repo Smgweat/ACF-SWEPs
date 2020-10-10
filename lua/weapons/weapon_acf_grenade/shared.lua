@@ -125,14 +125,17 @@ end
 
 
 function SWEP:PrimaryAttack()
+
 	if self:CanPrimaryAttack() then
+
 		self.PressedTime = CurTime()
-		if SERVER then
-			self.Weapon:SendWeaponAnim(ACT_VM_PULLPIN)
-		end
+
+		if IsFirstTimePredicted() then self:SendWeaponAnim(ACT_VM_PULLPIN) end
+
 	end
 	
-	self.Weapon:SetNextPrimaryFire(CurTime() + self.Primary.Delay)
+	self:SetNextPrimaryFire(CurTime() + self.Primary.Delay)
+
 end
 
 
@@ -164,5 +167,5 @@ end
 
 function SWEP:ShootEffects()
 	self:SendWeaponAnim( ACT_VM_THROW )		-- View model animation
-	self.Owner:SetAnimation( PLAYER_ATTACK1 )	-- 3rd Person Animation
+	self:GetOwner():SetAnimation( PLAYER_ATTACK1 )	-- 3rd Person Animation
 end

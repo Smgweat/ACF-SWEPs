@@ -28,9 +28,9 @@ if true then -- Shared variables
     SWEP.ViewModel 		= "models/weapons/cstrike/c_pist_p228.mdl"
     SWEP.WorldModel 	= "models/weapons/w_pist_p228.mdl"
 
-    SWEP.Spawnable		= true
+    SWEP.Spawnable = true
     SWEP.AdminSpawnable	= false
-    SWEP.Category		= "ACF"
+    SWEP.Category	= "ACF"
 
     SWEP.Primary.Ammo 		 = "pistol"
 

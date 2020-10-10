@@ -51,32 +51,6 @@ if true then -- Shared variables
 
     SWEP.Spawnable	= false
     SWEP.AdminOnly	= false
-    --[[
-	SWEP.Primary.Sound = ""
-
-	sound.Add( 
-	{
-		name = SWEP.Primary.Sound,
-		channel = CHAN_WEAPON,
-		volume = 1.0,
-		level = 80,
-		pitch = { 90, 110 },
-		sound = ""
-	} )
-	--]]
-    --[[
-	SWEP.Secondary.Sound = ""
-  
-	sound.Add( 
-	{
-		name = SWEP.Primary.Sound,
-		channel = CHAN_WEAPON,
-		volume = 1.0,
-		level = 80,
-		pitch = { 90, 110 },
-		sound = ""
-	} )
-]]--
 
     sound.Add(
         {
@@ -89,16 +63,12 @@ if true then -- Shared variables
         } )
 
     SWEP.Primary.Ammo 		 = "none"
-    SWEP.Primary.TPSound   	 = ""
-    SWEP.Primary.DistSound 	 = ""
     SWEP.Primary.Delay		 = 0
     SWEP.Primary.ClipSize 	 = -1
     SWEP.Primary.DefaultClip = -1
     SWEP.Primary.Automatic 	 = false
 
     SWEP.Secondary.Ammo 	   = "none"
-    SWEP.Secondary.TPSound     = ""
-    SWEP.Secondary.DistSound   = ""
     SWEP.Secondary.Delay	   = 0
     SWEP.Secondary.ClipSize    = -1
     SWEP.Secondary.DefaultClip = -1
@@ -144,7 +114,7 @@ function SWEP:InitBulletData()
     local Ammunition = self.Ammunition
     local GunType 	 = self.GunType
     local Caliber 	 = self.Caliber / 10 -- Conversion from mm to cm
-    local Length 	   = self.Length / 10 -- Conversion from mm to cm
+    local Length 	 = self.Length / 10 -- Conversion from mm to cm
     local MuzzleVel  = self.MuzzleVel
     local BulletMass = self.BulletMass
 
@@ -166,7 +136,7 @@ function SWEP:InitBulletData()
     elseif Ammunition == "HP" then
         self.BulletData["ShovePower"] 	= 0.365
         self.BulletData["Ricochet"]		= 90
-        FrontArea 						= 3.1416 * ( (Caliber + 0.33*Length) / 2 )^2
+        FrontArea 						= 3.1416 * ( ( Caliber + 0.33 * Length ) / 2 )^2
     end
 
     self.BulletData["Id"]					= "7.62mmMG" 									-- This value has no meaning
@@ -183,7 +153,7 @@ function SWEP:InitBulletData()
     self.BulletData["RoundVolume"]			= Length * FrontArea * 9.1						-- Auto determined
     self.BulletData["Type"]		    		= Ammunition									-- Predetermined
     self.BulletData["InvalidateTraceback"]	= true											-- Unknown
-    self.BulletData["Tracer"]				= 2.5
+    self.BulletData["Tracer"]				= 1.25
     self.BulletData["ShovePower"]			= 1												-- 0.8 may be better
 
 end
@@ -215,12 +185,7 @@ function SWEP:Initialize()
   self:InitBulletData()
 
 	if ( SERVER ) then
-    
-		self:SetNPCMinBurst( 0 )
-		self:SetNPCMaxBurst( 0 )
-		self:SetNPCFireRate( self.Primary.Delay )
         self:UpdateFakeCrate()
-    
 	end
 
 	self:SetWeaponHoldType( self.HoldType )
@@ -231,7 +196,7 @@ function SWEP:Think()
 
     if self.ThinkBefore then self:ThinkBefore() end
 
-    local isReloading = self.Weapon:GetNetworkedBool( "reloading", false )
+    local isReloading = self:GetNetworkedBool( "reloading", false )
 
     if CLIENT then
 
@@ -251,11 +216,11 @@ function SWEP:Think()
 
     if SERVER then
         --self:SetNetworkedFloat("ServerInacc", self.Inaccuracy)
-        self:SetNetworkedFloat("ServerStam", self.Owner.XCFStamina)
+        self:SetNetworkedFloat("ServerStam", self:GetOwner().XCFStamina)
 
-        if self.Owner:KeyDown(IN_ATTACK2) and self.HasZoom and self:CanZoom() and not self.Zoomed then
+        if self:GetOwner():KeyDown(IN_ATTACK2) and self.HasZoom and self:CanZoom() and not self.Zoomed then
             self:SetZoom(true)
-        elseif not self.Owner:KeyDown(IN_ATTACK2) and self.Zoomed then
+        elseif not self:GetOwner():KeyDown(IN_ATTACK2) and self.Zoomed then
             self:SetZoom(false)
         end
 
@@ -273,9 +238,9 @@ function SWEP:Think()
         if self.RecoilShock == nil then self.RecoilShock = Angle( 0, 0, 0 ) end
 
         -- Smooth recoil function.
-        if not self.Owner:IsNPC() and math.abs(self.RecoilShock.p) + math.abs(self.RecoilShock.y) > 0.1 then
+        if not self:GetOwner():IsNPC() and math.abs(self.RecoilShock.p) + math.abs(self.RecoilShock.y) > 0.1 then
 
-            self.Owner:SetEyeAngles( self.Owner:EyeAngles() + self.RecoilShock * 0.2 )
+            self:GetOwner():SetEyeAngles( self:GetOwner():EyeAngles() + self.RecoilShock * 0.2 )
 
             local recoilShockNormalized = self.RecoilShock / math.sqrt( self.RecoilShock.p * self.RecoilShock.p + self.RecoilShock.y * self.RecoilShock.y )
             local fadeOff = math.Clamp( ( math.abs( self.RecoilShock.p ) + math.abs( self.RecoilShock.y ) + math.abs( self.RecoilShock.r ) ), 0, 1 )
@@ -293,7 +258,7 @@ end
 
 function SWEP:CanZoom()
 
-    local sprinting = self.Owner:KeyDown(IN_SPEED)
+    local sprinting = self:GetOwner():KeyDown(IN_SPEED)
     if sprinting then return true end
 
     return true
@@ -305,7 +270,7 @@ function SWEP:SetZoom(zoom)
     if zoom == nil then
         self.Zoomed = not self.Zoomed
     else
-        if ( not self.Owner:IsNPC() and SERVER ) then self.Owner:SendLua( "EmitSound( \"weapons/sniper/sniper_zoomin.wav\", EyePos(), -2 )" ) end
+        if ( not self:GetOwner():IsNPC() and SERVER ) then self:GetOwner():SendLua( "EmitSound( \"weapons/sniper/sniper_zoomin.wav\", EyePos(), -2 )" ) end
         self.Zoomed = zoom
     end
 
@@ -316,7 +281,7 @@ function SWEP:SetZoom(zoom)
 
         if SERVER then
             self:SetOwnerZoomSpeed(true)
-            self.Owner:SetFOV(self.ZoomFOV, 0.25)
+            self:GetOwner():SetFOV(self.ZoomFOV, 0.25)
         end
 
     else
@@ -327,7 +292,7 @@ function SWEP:SetZoom(zoom)
 
         if SERVER then
             self:SetOwnerZoomSpeed(false)
-            self.Owner:SetFOV(0, 0.25)
+            self:GetOwner():SetFOV(0, 0.25)
         end
 
     end
@@ -338,16 +303,16 @@ function SWEP:SetOwnerZoomSpeed(setSpeed)
 
     if setSpeed then
 
-        self.NormalPlayerWalkSpeed = self.Owner:GetWalkSpeed()
-        self.NormalPlayerRunSpeed = self.Owner:GetRunSpeed()
+        self.NormalPlayerWalkSpeed = self:GetOwner():GetWalkSpeed()
+        self.NormalPlayerRunSpeed = self:GetOwner():GetRunSpeed()
 
-        self.Owner:SetWalkSpeed( self.NormalPlayerWalkSpeed * 0.5 )
-        self.Owner:SetRunSpeed( self.NormalPlayerRunSpeed * 0.5 )
+        self:GetOwner():SetWalkSpeed( self.NormalPlayerWalkSpeed * 0.5 )
+        self:GetOwner():SetRunSpeed( self.NormalPlayerRunSpeed * 0.5 )
 
     elseif self.NormalPlayerWalkSpeed and self.NormalPlayerRunSpeed then
 
-        self.Owner:SetWalkSpeed( self.NormalPlayerWalkSpeed )
-        self.Owner:SetRunSpeed( self.NormalPlayerRunSpeed )
+        self:GetOwner():SetWalkSpeed( self.NormalPlayerWalkSpeed )
+        self:GetOwner():SetRunSpeed( self.NormalPlayerRunSpeed )
 
         self.NormalPlayerWalkSpeed = nil
         self.NormalPlayerRunSpeed = nil
@@ -356,45 +321,14 @@ function SWEP:SetOwnerZoomSpeed(setSpeed)
 
 end
 
-
-
---[[---------------------------------------------------------
-	Name: SWEP:Holster( weapon_to_swap_to )
-	Desc: Weapon wants to holster
-	RetV: Return true to allow the weapon to holster
------------------------------------------------------------]]
+--[[ Called when weapon tries to holster. ]]
 function SWEP:Holster()
 
     self:SetOwnerZoomSpeed(false)
-    self.LastAmmoCountAppliedRecoil = nil
     self.RecoilShock = Angle( 0, 0, 0 )
     return true
 
 end
-
-
-function SWEP:CanPrimaryAttack()
-
-    if self.Owner:IsNPC() then return true end
-    if self.Owner:InVehicle() then return false end
-    if self.Owner:GetMoveType() ~= MOVETYPE_WALK then return false end
-    if CurTime() < self.Weapon:GetNextPrimaryFire() then return false end
-    if self.Weapon:GetNetworkedBool( "reloading", false ) then return false end
-
-    if self.Primary.ClipSize < 0 then
-        if self.Owner:GetAmmoCount( self.Primary.Ammo ) <= 0 then return false end
-    else
-        if self.Weapon:Clip1() <= 0 then
-            self.Weapon:EmitSound( "acf_sweps_misfire" )
-            self:SetNextPrimaryFire( CurTime() + 0.5 )
-            return false
-        end
-    end
-
-    return true
-
-end
-
 
 function SWEP:SetInaccuracy(add)
     ACF.SWEP.SetInaccuracy(self, add)
@@ -404,45 +338,130 @@ function SWEP:AddInaccuracy(add)
     ACF.SWEP.AddInaccuracy(self, add)
 end
 
+function SWEP:CanPrimaryAttack()
+
+    if CurTime() < self:GetNextPrimaryFire() then return false end
+
+    if self:GetOwner():InVehicle() then return false end
+    if self:GetOwner():GetMoveType() ~= MOVETYPE_WALK then return false end
+
+    if self:GetNetworkedBool( "reloading", false ) then return false end
+
+    if self.Primary.ClipSize < 0 and self:GetOwner():GetAmmoCount( self.Primary.Ammo ) <= 0 then return false end
+    
+    if self:Clip1() <= 0 and self:GetMaxClip1() > 0 then
+        self:EmitSound( "acf_sweps_misfire" )
+        self:SetNextPrimaryFire( CurTime() + 0.5 )
+        return false
+    end
+
+    return true
+
+end
+
+function SWEP:CanSecondaryAttack()
+
+    if CurTime() < self:GetNextSecondaryFire() then return false end
+
+	if self:Clip2() <= 0 and self:GetMaxClip2() > 0 then
+        self:EmitSound( "acf_sweps_misfire" )
+        self:SetNextSecondaryFire( CurTime() + 0.5 )
+        return false
+	end
+
+	return true
+
+end
+
 function SWEP:PrimaryAttack()
-  
-    --print( "Standard primary Attack was called " )
-  
-    if self:CanPrimaryAttack() then
 
-        if self.Weapon:Clip1() > 0 then
-          
-            self.Weapon:TakePrimaryAmmo(1)
-            
-        end
+    if self:GetOwner():IsNPC() then 
 
-        self.Weapon:SendWeaponAnim( ACT_VM_PRIMARYATTACK )
-        self.Owner:MuzzleFlash()
-        self.Owner:SetAnimation( PLAYER_ATTACK1 )
+        return self:PrimaryAttackNPC() 
 
-        if ( CLIENT and IsFirstTimePredicted() ) or ( game.SinglePlayer() and SERVER ) then
-            self.Weapon:EmitSound( self.Primary.TPSound, math.random(90,110), math.random(90,110) )
-        end
+    elseif self:CanPrimaryAttack() then
+
+        self:TakePrimaryAmmo(1)
+        self:EmitSound( self.Primary.Sound )
+        self:GetOwner():SetAnimation( PLAYER_ATTACK1 )
+        self:SendWeaponAnim( ACT_VM_PRIMARYATTACK )
+        self:SetNextPrimaryFire( CurTime() + self.Primary.Delay )
 
         if SERVER then self:FireBullet() end
         
         self:VisRecoil()
         self:AddInaccuracy( self.InaccuracyPerShot )
-        self.Weapon:SetNextPrimaryFire(CurTime() + self.Primary.Delay)
-        
+
+        return true
+
+    else
+
+        return false
+
+    end
+
+end
+
+function SWEP:SecondaryAttack()
+
+    if self:GetOwner():IsNPC() then
+
+        return self:SecondaryAttackNPC()
+
+    elseif self:CanSecondaryAttack() then
+
+        self:TakeSecondaryAmmo(1)
+
+        return true
+
+    else
+
+        return false
+
+    end
+
+end
+
+function SWEP:PrimaryAttackNPC()
+
+    if CurTime() >= self:GetNextPrimaryFire() then
+
+        self:EmitSound( self.Primary.Sound )
+        self:SendWeaponAnim( ACT_VM_PRIMARYATTACK )
+        self:SetNextPrimaryFire( CurTime() + self.Primary.Delay )
+        self:FireBullet()
+
+        return true
+
+    else
+
+        return false
+
+    end
+
+end
+
+function SWEP:SecondaryAttackNPC()
+
+    if CurTime() >= self:GetNextSecondaryFire() then
+
+        return true
+
+    else
+
+        return false
+
     end
 
 end
 
 function SWEP:VisRecoil()
 
-    if self:Clip1() == self.LastAmmoCountAppliedRecoil then return end
-
-    if ( (game.SinglePlayer() and SERVER) or ( not game.SinglePlayer() and CLIENT and IsFirstTimePredicted() ) ) then
+    if IsFirstTimePredicted() then
 
         local punchScale = ( ( self.BulletMass * 0.1 * self.MuzzleVel ) / ( self.Handling.Mass ) )
 
-        if self.Owner:Crouching() then punchScale = punchScale * 0.5 end
+        if self:GetOwner():Crouching() then punchScale = punchScale * 0.75 end
 
         local rnda = ( -punchScale * math.random() ) * 10
         local rndb = ( math.random() * punchScale - punchScale / 2 ) * 10
@@ -452,66 +471,29 @@ function SWEP:VisRecoil()
         self.RecoilShock = self.RecoilShock + Angle( rnda, rndb, 0 )
 
     end
-end
-
-
-function SWEP:CalculateVisRecoilScale()
-
-    local moving = self.Owner:KeyDown(IN_FORWARD) or self.Owner:KeyDown(IN_BACK) or self.Owner:KeyDown(IN_MOVELEFT) or self.Owner:KeyDown(IN_MOVERIGHT)
-    local crouching = self.Owner:KeyDown(IN_DUCK) or inVehicle
-    local zoomed = self:GetNetworkedBool("Zoomed")
-
-    local inacc = 1
-
-    if zoomed then
-        if crouching and not moving then
-            inacc = 0.5
-        elseif not moving then
-            inacc = 0.65
-        elseif crouching then
-            inacc = 0.8
-        else
-            inacc = 0.8
-        end
-    elseif crouching then
-        inacc = 0.85
-    end
-
-    return inacc
 
 end
 
 SWEP.Zoomed = false
 
-function SWEP:SecondaryAttack()
-
-    --[[
-	if SERVER and self.HasZoom and self:CanZoom() then
-		self:SetZoom()
-	end
-	--]]
-    return false
-
-end
-
-
-
 function SWEP:Reload()
 
-    if self.Weapon:GetNetworkedBool( "reloading", false ) then return end
+    if self:GetOwner():IsNPC() then self:GetOwner():SetAnimation( ACT_RELOAD ) return end
+
+    if self:GetNetworkedBool( "reloading", false ) then return end
 
     if self.Zoomed then return false end
 
-    if self:Clip1() < self.Primary.ClipSize and ( self.Owner:IsNPC() or self.Owner:GetAmmoCount( self.Primary.Ammo ) > 0 ) then
+    if self:Clip1() < self.Primary.ClipSize and ( self:GetOwner():IsNPC() or self:GetOwner():GetAmmoCount( self.Primary.Ammo ) > 0 ) then
 
 
         if SERVER then
-            self.Weapon:SetNetworkedBool( "reloading", true )
+            self:SetNetworkedBool( "reloading", true )
             --self.Weapon:SetVar( "reloadtimer", CurTime() + self.ReloadTime )
             timer.Simple(self.ReloadTime, function() if IsValid(self) then self.Weapon:SetNetworkedBool( "reloading", false ) end end)
-            self.Weapon:SetNextPrimaryFire(CurTime() + self.ReloadTime)
-            --self.Owner:DoReloadEvent()
-            self.Owner:SetAnimation( ACT_RELOAD )
+            self:SetNextPrimaryFire(CurTime() + self.ReloadTime)
+            --self:GetOwner():DoReloadEvent()
+            self:GetOwner():SetAnimation( ACT_RELOAD )
         end
 
 
@@ -529,9 +511,7 @@ end
 
 
 function SWEP.randvec(min, max)
-    return Vector(	min.x+math.random()*(max.x-min.x),
-        min.y+math.random()*(max.y-min.y),
-        min.z+math.random()*(max.z-min.z))
+    return Vector(	min.x + math.random() * ( max.x-min.x ), min.y + math.random() * ( max.y-min.y ), min.z + math.random() * ( max.z-min.z ) )
 end
 
 -- Randomly perturbs a vector within a cone of Degs degrees.
@@ -540,6 +520,7 @@ end
 SWEP.cachedvec = Vector()
 
 function SWEP:inaccuracy(vec, degs)
+
     local rand = self.randvec(vec, self.cachedvec)
     self.cachedvec = rand:Cross(VectorRand()):GetNormalized()
 
@@ -550,136 +531,38 @@ function SWEP:inaccuracy(vec, degs)
     sint = math.sqrt( 1 - z*z )
 
     return rand * math.cos(phi) * sint + self.cachedvec * math.sin(phi) * sint + vec * z
-end
-
-
-
-function SWEP:ShootEffects()
-
-    self:SendWeaponAnim( ACT_VM_PRIMARYATTACK )	-- View model animation
-    self.Owner:SetAnimation( PLAYER_ATTACK1 )   -- 3rd Person Animation
 
 end
 
-
-
+-- [[ Called before firing animation events, such as muzzle flashes or shell ejections. ]]
 function SWEP:FireAnimationEvent(pos,ang,event)
-
-    local curtime = CurTime()
-
-    if not self.NextFlash then self.NextFlash = curtime - 0.05 end
-
-    -- firstperson muzzleflash
-    if event == 5001 then
-
-        if self.NextFlash > curtime then return true end
-
-        self.NextFlash = curtime + 0.05
-
-        local Effect = EffectData()
-        Effect:SetEntity( self )
-        --Effect:SetOrigin(pos)
-        --Effect:SetAngles(ang)
-        Effect:SetScale( self.BulletData["PropMass"] or 1 )
-        Effect:SetMagnitude( self.ReloadTime )
-        Effect:SetSurfaceProp( ACF.RoundTypes[self.BulletData["Type"]]["netid"] or 1 )	--Encoding the ammo type into a table index
-        Effect:SetMaterialIndex(5001) -- flag for effect from animation event
-        util.Effect( "ACF_SWEPMuzzleFlash", Effect, true)
-
-        return true
-
-    end
-
-    -- Disable thirdperson muzzle flash
-    if ( event == 5003 ) then
-
-        if self.NextFlash > curtime then return true end
-
-        self.NextFlash = curtime + 0.05
-
-        local Effect = EffectData()
-        Effect:SetEntity( self )
-        Effect:SetOrigin(self:GetAttachment(1).Pos)
-        --Effect:SetAngles(ang)
-        Effect:SetScale( self.BulletData["PropMass"] or 1 )
-        Effect:SetMagnitude( self.ReloadTime )
-        Effect:SetSurfaceProp( ACF.RoundTypes[self.BulletData["Type"]]["netid"] or 1 )	--Encoding the ammo type into a table index
-        Effect:SetMaterialIndex(5003) -- flag for effect from animation event
-        util.Effect( "ACF_SWEPMuzzleFlash", Effect, true)
-
-        return true
-
-    end
-
-    --if ( event == 6002 ) then return true end
-
 end
 
-
-function SWEP:UpdateTracers(overrideCol)
-
-    if not SERVER then return end
-
-    if overrideCol then
-
-        self.BulletData["Colour"] =	overrideCol
-
-    elseif ACF.SWEP.PlayerTracers and IsValid(self.Owner) then
-
-        local col = self.Owner:GetPlayerColor()
-        self.BulletData["Colour"] =	Color(col.r * 255, col.g * 255, col.b * 255)
-
-    end
-
-    self:UpdateFakeCrate()
-
-end
-
-
---[[---------------------------------------------------------
-	Name: Equip
-	Desc: A player or NPC has picked the weapon up
------------------------------------------------------------]]
+--[[ Called when a player or NPC has picked the weapon up. ]]
 function SWEP:Equip(ply)
 
-	self.Owner = ply
+    self:SetOwner( ply )
     
-	--if self.Owner:IsNPC() then
-	--	self.Owner:SetCurrentWeaponProficiency( WEAPON_PROFICIENCY_PERFECT  )
-	--end
+    self:SetNextPrimaryFire( CurTime() )
 
-	--self:SetHoldType( self.HoldType )
-	
-	self:SetNextPrimaryFire( CurTime() )
-    
-    --self:UpdateTracers()
-    
     self.RecoilAxis = Vector(0,0,0)
-	
-	self.LastAmmoCountAppliedRecoil = nil
+    
+    self.LastAmmoCountAppliedRecoil = nil
     
     self:SetOwnerZoomSpeed(false)
     
 end
 
---[[---------------------------------------------------------
-	Name: OnDrop
-	Desc: Weapon was dropped
------------------------------------------------------------]]
+--[[ Called when weapon is dropped by Player:DropWeapon. ]]
 function SWEP:OnDrop()
-
-
-
 end
 
 --[[---------------------------------------------------------
 	Name: ShouldDropOnDie
 	Desc: Should this weapon be dropped when its owner dies?
 -----------------------------------------------------------]]
-function SWEP:ShouldDropOnDie()
-
-	return true
-	
+function SWEP:ShouldDropOnDie() 
+    return true
 end
 
 --[[---------------------------------------------------------
@@ -687,44 +570,12 @@ end
 	Desc: For NPCs, returns what they should try to do with it.
 -----------------------------------------------------------]]
 function SWEP:GetCapabilities()
-	return ( CAP_WEAPON_RANGE_ATTACK1 || CAP_INNATE_RANGE_ATTACK1 || CAP_WEAPON_RANGE_ATTACK2 || CAP_INNATE_RANGE_ATTACK2 )
-end
-
---[[---------------------------------------------------------
-	Name: NPCShoot_Secondary
-	Desc: NPC tried to fire secondary attack
------------------------------------------------------------]]
-function SWEP:NPCShoot_Secondary( shootPos, shootDir )
-
-	self:SecondaryAttack()
-
-end
-
---[[---------------------------------------------------------
-	Name: NPCShoot_Primary
-	Desc: NPC tried to fire primary attack
------------------------------------------------------------]]
-function SWEP:NPCShoot_Primary( shootPos, shootDir )
-    
-  if self:CanPrimaryAttack() then
-    
-    self.Owner:MuzzleFlash()
-    self.Owner:SetAnimation( PLAYER_ATTACK1 )
-    self.Weapon:SetNextPrimaryFire(CurTime() + self.Primary.Delay)
-
-    if IsFirstTimePredicted() then
-        self.Weapon:EmitSound( self.Primary.TPSound, 100, math.random(90,110) )
-    end
-    
-    if SERVER then self:FireBullet() end
-    
-  end
-
+	return ( CAP_WEAPON_RANGE_ATTACK1 || CAP_INNATE_RANGE_ATTACK1 || CAP_WEAPON_RANGE_ATTACK2 || CAP_INNATE_RANGE_ATTACK2  )
 end
 
 -- These tell the NPC how to use the weapon
-AccessorFunc( SWEP, "fNPCMinBurst",		"NPCMinBurst" )
-AccessorFunc( SWEP, "fNPCMaxBurst",		"NPCMaxBurst" )
-AccessorFunc( SWEP, "fNPCFireRate",		"NPCFireRate" )
-AccessorFunc( SWEP, "fNPCMinRestTime",	"NPCMinRest" )
-AccessorFunc( SWEP, "fNPCMaxRestTime",	"NPCMaxRest" )
+AccessorFunc( SWEP, "fNPCMinBurst",	"NPCMinBurst" )
+AccessorFunc( SWEP, "fNPCMaxBurst",	"NPCMaxBurst" )
+AccessorFunc( SWEP, "fNPCFireRate",	"NPCFireRate" )
+AccessorFunc( SWEP, "fNPCMinRestTime", "NPCMinRest" )
+AccessorFunc( SWEP, "fNPCMaxRestTime", "NPCMaxRest" )

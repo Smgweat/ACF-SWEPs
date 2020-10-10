@@ -1,4 +1,5 @@
 
+AddCSLuaFile( "vgui/entities/weapon_acf_m249.vmt" )
 AddCSLuaFile( "shared.lua" )
 
 if CLIENT then -- Client only variables
@@ -28,9 +29,9 @@ if true then -- Shared variables
     SWEP.ViewModel  = "models/weapons/cstrike/c_mach_m249para.mdl"
     SWEP.WorldModel = "models/weapons/w_mach_m249para.mdl"
 
-    SWEP.Spawnable      = true
+    SWEP.Spawnable = true
     SWEP.AdminSpawnable	= false
-    SWEP.Category       = "ACF"
+    SWEP.Category	= "ACF"
 
     SWEP.Primary.Ammo = "ar2"
 

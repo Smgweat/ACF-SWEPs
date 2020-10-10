@@ -1,4 +1,5 @@
 
+AddCSLuaFile( "vgui/entities/weapon_acf_fseven.vmt" )
 AddCSLuaFile( "shared.lua" )
 
 if CLIENT then -- Client only variables
@@ -28,9 +29,9 @@ if true then -- Shared variables
 	SWEP.ViewModel 		= "models/weapons/cstrike/c_pist_fiveseven.mdl"
 	SWEP.WorldModel 	= "models/weapons/w_pist_fiveseven.mdl"
 
-	SWEP.Spawnable		= true
-	SWEP.AdminSpawnable	= false
-	SWEP.Category		= "ACF"
+    SWEP.Spawnable = true
+    SWEP.AdminSpawnable	= false
+    SWEP.Category	= "ACF"
 
 	SWEP.Primary.Ammo 	= "pistol"
 	

@@ -1,4 +1,5 @@
 
+AddCSLuaFile( "vgui/entities/weapon_acf_galil.vmt" )
 AddCSLuaFile( "shared.lua" )
 
 if CLIENT then -- Client only variables
@@ -30,7 +31,7 @@ if true then -- Shared variables
 
     SWEP.Spawnable = true
     SWEP.AdminSpawnable	= false
-    SWEP.Category = "ACF"
+    SWEP.Category	= "ACF"
 
     SWEP.Primary.Ammo = "ar2"
 
